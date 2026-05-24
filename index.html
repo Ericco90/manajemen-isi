@@ -297,11 +297,55 @@
         z-index: 0;
       }
       @media (max-width: 640px) {
+        #container-struktur.org-pyramid {
+          gap: 1.75rem;
+          overflow-x: hidden;
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
         .org-tier {
-          gap: 1.25rem 0.75rem;
+          flex-wrap: nowrap;
+          gap: 0.55rem;
+          max-width: 100% !important;
         }
         .org-tier:not(:first-child)::before {
           width: min(82%, calc(100% - 2rem));
+        }
+        .org-pyramid .tree-node {
+          flex: 0 1
+            calc((100% - var(--tier-gap-total, 0rem)) / var(--tier-count, 1));
+          max-width: 8rem;
+          min-width: 0;
+          width: calc(
+            (100% - var(--tier-gap-total, 0rem)) / var(--tier-count, 1)
+          ) !important;
+        }
+        .org-pyramid .tree-node > .glass {
+          padding: 0.65rem 0.3rem;
+          border-radius: 0.75rem;
+        }
+        .org-pyramid .tree-node img {
+          width: clamp(2.65rem, 14vw, 3.5rem);
+          height: clamp(2.65rem, 14vw, 3.5rem);
+          margin-top: 0.2rem;
+          margin-bottom: 0.45rem;
+        }
+        .org-pyramid .tree-node h4 {
+          display: -webkit-box;
+          min-height: 1.65em;
+          overflow: hidden;
+          padding-left: 0;
+          padding-right: 0;
+          white-space: normal;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          font-size: clamp(0.62rem, 2.6vw, 0.78rem);
+        }
+        .org-pyramid .tree-node p {
+          margin-top: 0.35rem;
+          padding-top: 0.35rem;
+          font-size: clamp(0.55rem, 2.2vw, 0.7rem);
+          line-height: 1.2;
         }
       }
 
@@ -2414,6 +2458,11 @@
             const tierDiv = document.createElement("div");
             tierDiv.className = `org-tier ${members.length > 1 ? "has-siblings" : ""}`;
             tierDiv.style.maxWidth = `${Math.min(72, 16 + index * 18 + members.length * 10)}rem`;
+            tierDiv.style.setProperty("--tier-count", members.length);
+            tierDiv.style.setProperty(
+              "--tier-gap-total",
+              `${Math.max(0, members.length - 1) * 0.55}rem`,
+            );
 
             members.forEach((s) => {
               const card = document.createElement("div");
