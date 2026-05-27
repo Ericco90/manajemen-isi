@@ -2782,27 +2782,27 @@
             .filter((a) => a.status === "Aktif")
             .sort((x, y) => x.nama.localeCompare(y.nama));
 
-          const getMonthlyIuran = (idAnggota, bulan, tahun) =>
-            window.App.data.iuran
-              .filter(
-                (i) =>
-                  i.id_anggota === idAnggota &&
-                  parseInt(i.bulan) === parseInt(bulan) &&
-                  String(i.tahun) === String(tahun),
-              )
-              .sort((x, y) => {
-                const score = (item) => (item.status === "Lunas" ? 1 : 0);
-                return score(y) - score(x) || new Date(y.tgl) - new Date(x.tgl);
-              })[0];
+          const iuranMap = {};
+          window.App.data.iuran.forEach(i => {
+            const key = `${i.id_anggota}_${parseInt(i.bulan)}_${i.tahun}`;
+            if (!iuranMap[key] || (i.status === "Lunas" && iuranMap[key].status !== "Lunas")) {
+              iuranMap[key] = i;
+            } else if (iuranMap[key].status === i.status) {
+              if (new Date(i.tgl) > new Date(iuranMap[key].tgl)) {
+                 iuranMap[key] = i;
+              }
+            }
+          });
+          const getMonthlyIuran = (idAnggota, bulan, tahun) => iuranMap[`${idAnggota}_${parseInt(bulan)}_${tahun}`];
 
           document.getElementById("thead-iuran").innerHTML =
             `<tr><th class="p-4">Anggota</th><th class="p-4">Bulan</th><th class="p-4">Tahun</th><th class="p-4 text-right">Nominal</th><th class="p-4 text-center">Status</th><th class="p-4">Keterangan</th>${window.App.isAdmin ? '<th class="p-4 text-center admin-only">Aksi</th>' : ""}</tr>`;
           const tbody = document.getElementById("tbody-iuran");
-          tbody.innerHTML = "";
 
           if (members.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${window.App.isAdmin ? "7" : "6"}" class="p-8 text-center text-gray-500">Belum ada anggota aktif untuk direkap.</td></tr>`;
           } else {
+            let htmlRows = "";
             members.forEach((member) => {
               years.forEach((tahun) => {
                 months.forEach((bulan) => {
@@ -2830,10 +2830,11 @@
                   const nominalDisplay = i ? window.Utils.formatRupiah(i.nominal) : window.Utils.formatRupiah(10000);
                   const nominalColor = status === "Lunas" ? "text-pupus" : (status === "Belum Lunas" ? "text-orange-300" : "text-red-400/80");
 
-                  tbody.innerHTML += `<tr><td class="p-4 font-semibold">${member.nama}<div class="text-[10px] text-gray-500 font-mono">${member.id}</div></td><td class="p-4">${window.Utils.getMonthName(bulan)}</td><td class="p-4">${tahun}</td><td class="p-4 text-right font-semibold ${nominalColor}">${nominalDisplay}</td><td class="p-4 text-center"><span class="px-2 py-1 text-xs rounded border ${stCls} uppercase tracking-wider">${status}</span></td><td class="p-4 text-sm text-gray-400">${keterangan}</td>${actions}</tr>`;
+                  htmlRows += `<tr><td class="p-4 font-semibold">${member.nama}<div class="text-[10px] text-gray-500 font-mono">${member.id}</div></td><td class="p-4">${window.Utils.getMonthName(bulan)}</td><td class="p-4">${tahun}</td><td class="p-4 text-right font-semibold ${nominalColor}">${nominalDisplay}</td><td class="p-4 text-center"><span class="px-2 py-1 text-xs rounded border ${stCls} uppercase tracking-wider">${status}</span></td><td class="p-4 text-sm text-gray-400">${keterangan}</td>${actions}</tr>`;
                 });
               });
             });
+            tbody.innerHTML = htmlRows;
           }
         },
 
