@@ -356,38 +356,85 @@
 
       /* Print styles */
       @media print {
+        @page {
+          size: A4 portrait;
+          margin: 15mm;
+        }
         body {
-          background: white;
-          color: black;
+          background: white !important;
+          color: black !important;
         }
         #sidebar,
         #header,
         .no-print,
-        .admin-only {
+        .admin-only,
+        button {
           display: none !important;
         }
-        #main-content {
-          margin: 0;
-          padding: 0;
-          width: 100%;
+        /* Ensure layout is not restricted by height or scroll */
+        #app-layout, .flex-1, #main-container {
+          height: auto !important;
+          overflow: visible !important;
+          display: block !important;
+          position: static !important;
+        }
+        #main-container {
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        /* Allow tables to show completely */
+        .overflow-x-auto, .overflow-hidden, .glass-card {
+          overflow: visible !important;
+          height: auto !important;
         }
         .glass-card,
         .glass {
-          background: white;
-          border: 1px solid #ccc;
-          box-shadow: none;
-          color: black;
+          background: white !important;
+          border: 1px solid #ddd !important;
+          box-shadow: none !important;
+          color: black !important;
+          page-break-inside: avoid;
+          break-inside: avoid;
+          margin-bottom: 20px;
         }
-        .mystic-table th {
-          background: #eee;
-          color: black;
+        /* Table fixes */
+        table, .mystic-table {
+          width: 100% !important;
+          table-layout: auto !important;
+          border-collapse: collapse !important;
         }
-        .text-pupus,
-        .text-gold {
+        /* Prevent text from overflowing and ensure wrap */
+        .mystic-table th, .mystic-table td, table td, table th, .whitespace-nowrap {
+          white-space: normal !important;
+          word-break: break-word !important;
           color: black !important;
         }
-        .ornament-border {
-          display: none;
+        .mystic-table th, .mystic-table td {
+          border: 1px solid #ccc !important;
+          padding: 8px !important;
+        }
+        .mystic-table th {
+          background: #f3f4f6 !important;
+          color: black !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .mystic-table tr {
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+        /* Fix colors */
+        .text-pupus,
+        .text-gold,
+        .text-red-400,
+        .text-white,
+        .text-gray-400,
+        .text-gray-200,
+        .text-gray-300 {
+          color: black !important;
+        }
+        .ornament-border, #global-loader, #toast-container {
+          display: none !important;
         }
       }
     </style>
@@ -522,9 +569,9 @@
           class="p-6 flex items-center justify-between border-b border-white/5"
         >
           <div class="flex items-center gap-3">
-            <i class="fa-solid fa-moon text-gold text-xl"></i>
+            <img id="sidebar-logo" src="image/logo.jpg" alt="Logo Yayasan" class="w-8 h-8 rounded-full border border-gold object-cover shadow-[0_0_5px_rgba(212,175,55,0.5)]">
             <h2 class="font-cinzel text-lg font-bold text-gold tracking-widest">
-              YISI
+              ISI
             </h2>
           </div>
           <button
@@ -544,7 +591,7 @@
                 class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-gold transition-colors active"
               >
                 <i class="fa-solid fa-compass w-5 text-center"></i>
-                <span class="font-medium text-sm">Pusat Meditasi</span>
+                <span class="font-medium text-sm">Dasboard Yayasan</span>
               </a>
             </li>
             <li
@@ -1169,6 +1216,30 @@
                 </table>
               </div>
             </div>
+
+            <!-- Print Only Detail Sections -->
+            <div class="hidden print:block space-y-6 mt-10">
+              <div style="page-break-before: always;"></div>
+              <h4 class="font-cinzel text-xl text-black mb-4 font-bold">Rincian Iuran</h4>
+              <table class="w-full text-left border-collapse mystic-table text-sm">
+                <thead id="thead-laporan-iuran-print"></thead>
+                <tbody id="tbody-laporan-iuran-print"></tbody>
+              </table>
+
+              <div style="page-break-before: always;"></div>
+              <h4 class="font-cinzel text-xl text-black mb-4 font-bold mt-8">Rincian Pemasukan Lain</h4>
+              <table class="w-full text-left border-collapse mystic-table text-sm">
+                <thead id="thead-laporan-pemasukan-print"></thead>
+                <tbody id="tbody-laporan-pemasukan-print"></tbody>
+              </table>
+
+              <div style="page-break-before: always;"></div>
+              <h4 class="font-cinzel text-xl text-black mb-4 font-bold mt-8">Rincian Pengeluaran</h4>
+              <table class="w-full text-left border-collapse mystic-table text-sm">
+                <thead id="thead-laporan-pengeluaran-print"></thead>
+                <tbody id="tbody-laporan-pengeluaran-print"></tbody>
+              </table>
+            </div>
           </div>
         </main>
       </div>
@@ -1604,6 +1675,29 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Image Viewer Modal -->
+      <div
+        id="modal-image-viewer"
+        class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[100]"
+        onclick="this.classList.add('hidden')"
+      >
+        <div
+          class="glass-card w-full max-w-lg rounded-xl p-4 text-center animate-slide-up relative"
+          onclick="event.stopPropagation()"
+        >
+          <button
+            type="button"
+            class="absolute top-4 right-4 text-gray-400 hover:text-white bg-black/50 w-8 h-8 rounded-full flex items-center justify-center"
+            onclick="document.getElementById('modal-image-viewer').classList.add('hidden')"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+          <img id="viewer-img" src="" alt="View" class="w-full h-auto max-h-[70vh] object-contain rounded-lg mb-4 bg-mystic-900/50 border border-gold/20">
+          <h3 class="text-xl font-cinzel font-bold text-gold mb-1" id="viewer-title">Judul</h3>
+          <p class="text-sm text-pupus" id="viewer-desc">Keterangan</p>
         </div>
       </div>
 
@@ -2333,6 +2427,13 @@
       };
 
       window.UI = {
+        viewImage: (url, title, desc) => {
+          document.getElementById('viewer-img').src = url;
+          document.getElementById('viewer-title').textContent = title;
+          document.getElementById('viewer-desc').textContent = desc;
+          document.getElementById('modal-image-viewer').classList.remove('hidden');
+        },
+
         setLoader: (show) => {
           const el = document.getElementById("global-loader");
           if (show) el.classList.remove("hidden");
@@ -2448,6 +2549,15 @@
             if (a.status === "Aktif")
               select.innerHTML += `<option value="${a.id}">${a.nama} - ${a.id}</option>`;
           });
+        },
+
+        openIuranForMember: (idAnggota, bulan, tahun) => {
+          window.UI.modals.open("modal-iuran");
+          document.getElementById("iuran-anggota").value = idAnggota;
+          document.getElementById("iuran-bulan").value = bulan;
+          document.getElementById("iuran-tahun").value = tahun;
+          document.getElementById("iuran-status").value = "Lunas";
+          document.getElementById("iuran-nominal").focus();
         },
 
         renderDashboard: () => {
@@ -2572,7 +2682,7 @@
 
               card.innerHTML = `
                             <div class="glass border border-gold/40 shadow-[0_0_15px_rgba(212,175,55,0.1)] p-4 rounded-xl w-full relative transition transform hover:-translate-y-2 hover:border-gold hover:shadow-[0_0_25px_rgba(212,175,55,0.3)]">
-                                <img src="${imgUrl}" alt="${s.nama}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-full mx-auto border-2 border-gold shadow-[0_0_10px_rgba(212,175,55,0.4)] mb-3 mt-2 bg-mystic-800">
+                                <img src="${imgUrl}" alt="${s.nama}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-full mx-auto border-2 border-gold shadow-[0_0_10px_rgba(212,175,55,0.4)] mb-3 mt-2 bg-mystic-800 cursor-pointer hover:scale-110 transition-transform" onclick='window.UI.viewImage("${imgUrl}", ${JSON.stringify(s.nama).replace(/'/g, "&#39;")}, ${JSON.stringify(s.jabatan).replace(/'/g, "&#39;")})'>
                                 <h4 class="font-cinzel font-bold text-gold text-sm sm:text-base leading-tight truncate px-1" title="${s.nama}">${s.nama}</h4>
                                 <p class="text-[10px] sm:text-xs text-pupus-light mt-1 opacity-90 border-t border-white/10 pt-1 mt-2">${s.jabatan}</p>
                                 
@@ -2628,7 +2738,7 @@
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(a.nama)}&background=11261b&color=B2D2A4`;
 
               tbody.innerHTML += `<tr>
-                            <td class="p-4 text-center"><img src="${imgUrl}" alt="${a.nama}" class="w-10 h-10 mx-auto rounded-full border border-pupus/50 object-cover bg-mystic-800"></td>
+                            <td class="p-4 text-center"><img src="${imgUrl}" alt="${a.nama}" class="w-10 h-10 mx-auto rounded-full border border-pupus/50 object-cover bg-mystic-800 cursor-pointer hover:scale-110 transition-transform" onclick='window.UI.viewImage("${imgUrl}", ${JSON.stringify(a.nama).replace(/'/g, "&#39;")}, ${JSON.stringify(a.jabatan).replace(/'/g, "&#39;")})'></td>
                             <td class="p-4 text-xs font-mono text-gray-400">${a.id}</td>
                             <td class="p-4 font-semibold text-white">${a.nama}</td>
                             <td class="p-4">${a.hp}</td>
@@ -2643,34 +2753,89 @@
         renderIuran: () => {
           const b = document.getElementById("filter-bulan-iuran").value,
             t = document.getElementById("filter-tahun-iuran").value;
-          let data = window.App.data.iuran
-            .filter((i) => (!b || i.bulan === b) && (!t || i.tahun === t))
-            .sort((x, y) => new Date(y.tgl) - new Date(x.tgl));
+          const currentYear = String(new Date().getFullYear());
+          const months = b
+            ? [b]
+            : [
+                "01",
+                "02",
+                "03",
+                "04",
+                "05",
+                "06",
+                "07",
+                "08",
+                "09",
+                "10",
+                "11",
+                "12",
+              ];
+          const years = t
+            ? [t]
+            : [
+                ...new Set([
+                  currentYear,
+                  ...window.App.data.iuran.map((i) => String(i.tahun)),
+                ]),
+              ].sort((x, y) => parseInt(y) - parseInt(x));
+          const members = window.App.data.anggota
+            .filter((a) => a.status === "Aktif")
+            .sort((x, y) => x.nama.localeCompare(y.nama));
+
+          const getMonthlyIuran = (idAnggota, bulan, tahun) =>
+            window.App.data.iuran
+              .filter(
+                (i) =>
+                  i.id_anggota === idAnggota &&
+                  i.bulan === bulan &&
+                  String(i.tahun) === String(tahun),
+              )
+              .sort((x, y) => {
+                const score = (item) => (item.status === "Lunas" ? 1 : 0);
+                return score(y) - score(x) || new Date(y.tgl) - new Date(x.tgl);
+              })[0];
 
           document.getElementById("thead-iuran").innerHTML =
-            `<tr><th class="p-4">Tanggal Input</th><th class="p-4">Anggota</th><th class="p-4">Periode</th><th class="p-4 text-right">Nominal</th><th class="p-4 text-center">Status</th>${window.App.isAdmin ? '<th class="p-4 text-center">Aksi</th>' : ""}</tr>`;
+            `<tr><th class="p-4">Anggota</th><th class="p-4">Bulan</th><th class="p-4">Tahun</th><th class="p-4 text-right">Nominal</th><th class="p-4 text-center">Status</th><th class="p-4">Keterangan</th>${window.App.isAdmin ? '<th class="p-4 text-center admin-only">Aksi</th>' : ""}</tr>`;
           const tbody = document.getElementById("tbody-iuran");
           tbody.innerHTML = "";
 
-          if (data.length === 0)
-            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada catatan iuran.</td></tr>`;
-          else {
-            data.forEach((i) => {
-              const stCls =
-                i.status === "Lunas"
-                  ? "text-gold bg-gold/10 border-gold/30"
-                  : "text-red-400 bg-red-900/30 border-red-500/30";
-              const actions = window.App.isAdmin
-                ? `<td class="p-4 text-center"><div class="flex justify-center gap-2"><button onclick='window.UI.modals.open("modal-iuran", ${JSON.stringify(i).replace(/'/g, "\\'")})' class="w-8 h-8 rounded bg-blue-900/50 text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="window.App.crud.deleteData('iuran', '${i.id}')" class="w-8 h-8 rounded bg-red-900/50 text-red-400"><i class="fa-solid fa-trash"></i></button></div></td>`
-                : "";
-              tbody.innerHTML += `<tr><td class="p-4 text-sm text-gray-400">${window.Utils.formatDate(i.tgl)}</td><td class="p-4 font-semibold">${i.nama}<div class="text-[10px] text-gray-500 font-mono">${i.id_anggota}</div></td><td class="p-4">${window.Utils.getMonthName(i.bulan)} ${i.tahun}</td><td class="p-4 text-right font-semibold text-pupus">${window.Utils.formatRupiah(i.nominal)}</td><td class="p-4 text-center"><span class="px-2 py-1 text-xs rounded border ${stCls} uppercase tracking-wider">${i.status}</span></td>${actions}</tr>`;
+          if (members.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${window.App.isAdmin ? "7" : "6"}" class="p-8 text-center text-gray-500">Belum ada anggota aktif untuk direkap.</td></tr>`;
+          } else {
+            years.forEach((tahun) => {
+              months.forEach((bulan) => {
+                members.forEach((member) => {
+                  const i = getMonthlyIuran(member.id, bulan, tahun);
+                  const status = i?.status || "Belum Setor";
+                  const stCls =
+                    status === "Lunas"
+                      ? "text-gold bg-gold/10 border-gold/30"
+                      : status === "Belum Lunas"
+                        ? "text-orange-300 bg-orange-900/30 border-orange-500/30"
+                        : "text-red-400 bg-red-900/30 border-red-500/30";
+                  const keterangan =
+                    status === "Lunas"
+                      ? "Sudah iuran"
+                      : status === "Belum Lunas"
+                        ? "Sudah setor, belum lunas"
+                        : "Belum setor bulan ini";
+                  const actions =
+                    window.App.isAdmin && i
+                      ? `<td class="p-4 text-center admin-only"><div class="flex justify-center gap-2"><button onclick='window.UI.modals.open("modal-iuran", ${JSON.stringify(i).replace(/'/g, "\\'")})' class="w-8 h-8 rounded bg-blue-900/50 text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="window.App.crud.deleteData('iuran', '${i.id}')" class="w-8 h-8 rounded bg-red-900/50 text-red-400"><i class="fa-solid fa-trash"></i></button></div></td>`
+                      : window.App.isAdmin
+                        ? `<td class="p-4 text-center admin-only"><button onclick="window.UI.openIuranForMember('${member.id}', '${bulan}', '${tahun}')" class="px-3 py-1 rounded bg-gold/10 text-gold border border-gold/30 text-xs hover:bg-gold hover:text-mystic-900 transition"><i class="fa-solid fa-plus mr-1"></i>Catat</button></td>`
+                        : "";
+                  tbody.innerHTML += `<tr><td class="p-4 font-semibold">${member.nama}<div class="text-[10px] text-gray-500 font-mono">${member.id}</div></td><td class="p-4">${window.Utils.getMonthName(bulan)}</td><td class="p-4">${tahun}</td><td class="p-4 text-right font-semibold text-pupus">${i ? window.Utils.formatRupiah(i.nominal) : "-"}</td><td class="p-4 text-center"><span class="px-2 py-1 text-xs rounded border ${stCls} uppercase tracking-wider">${status}</span></td><td class="p-4 text-sm text-gray-400">${keterangan}</td>${actions}</tr>`;
+                });
+              });
             });
           }
         },
 
         renderPemasukan: () => {
           document.getElementById("thead-pemasukan").innerHTML =
-            `<tr><th class="p-4">Tanggal</th><th class="p-4">Sumber Pemasukan</th><th class="p-4">Keterangan</th><th class="p-4 text-right">Nominal</th>${window.App.isAdmin ? '<th class="p-4 text-center">Aksi</th>' : ""}</tr>`;
+            `<tr><th class="p-4">Tanggal</th><th class="p-4">Sumber Pemasukan</th><th class="p-4">Keterangan</th><th class="p-4 text-right">Nominal</th>${window.App.isAdmin ? '<th class="p-4 text-center admin-only">Aksi</th>' : ""}</tr>`;
           const tbody = document.getElementById("tbody-pemasukan");
           tbody.innerHTML = "";
           let data = [...window.App.data.pemasukan].sort(
@@ -2681,7 +2846,7 @@
           else
             data.forEach((p) => {
               const actions = window.App.isAdmin
-                ? `<td class="p-4 text-center"><div class="flex justify-center gap-2"><button onclick='window.UI.modals.open("modal-pemasukan", ${JSON.stringify(p).replace(/'/g, "\\'")})' class="w-8 h-8 rounded bg-blue-900/50 text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="window.App.crud.deleteData('pemasukan', '${p.id}')" class="w-8 h-8 rounded bg-red-900/50 text-red-400"><i class="fa-solid fa-trash"></i></button></div></td>`
+                ? `<td class="p-4 text-center admin-only"><div class="flex justify-center gap-2"><button onclick='window.UI.modals.open("modal-pemasukan", ${JSON.stringify(p).replace(/'/g, "\\'")})' class="w-8 h-8 rounded bg-blue-900/50 text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="window.App.crud.deleteData('pemasukan', '${p.id}')" class="w-8 h-8 rounded bg-red-900/50 text-red-400"><i class="fa-solid fa-trash"></i></button></div></td>`
                 : "";
               tbody.innerHTML += `<tr><td class="p-4">${window.Utils.formatDate(p.tgl)}</td><td class="p-4 font-semibold">${p.sumber}</td><td class="p-4 text-gray-400 text-sm max-w-xs truncate">${p.keterangan || "-"}</td><td class="p-4 text-right font-semibold text-pupus">${window.Utils.formatRupiah(p.nominal)}</td>${actions}</tr>`;
             });
@@ -2689,7 +2854,7 @@
 
         renderPengeluaran: () => {
           document.getElementById("thead-pengeluaran").innerHTML =
-            `<tr><th class="p-4">Tanggal</th><th class="p-4">Keperluan</th><th class="p-4">Keterangan</th><th class="p-4 text-right">Nominal</th>${window.App.isAdmin ? '<th class="p-4 text-center">Aksi</th>' : ""}</tr>`;
+            `<tr><th class="p-4">Tanggal</th><th class="p-4">Keperluan</th><th class="p-4">Keterangan</th><th class="p-4 text-right">Nominal</th>${window.App.isAdmin ? '<th class="p-4 text-center admin-only">Aksi</th>' : ""}</tr>`;
           const tbody = document.getElementById("tbody-pengeluaran");
           tbody.innerHTML = "";
           let data = [...window.App.data.pengeluaran].sort(
@@ -2700,7 +2865,7 @@
           else
             data.forEach((p) => {
               const actions = window.App.isAdmin
-                ? `<td class="p-4 text-center"><div class="flex justify-center gap-2"><button onclick='window.UI.modals.open("modal-pengeluaran", ${JSON.stringify(p).replace(/'/g, "\\'")})' class="w-8 h-8 rounded bg-blue-900/50 text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="window.App.crud.deleteData('pengeluaran', '${p.id}')" class="w-8 h-8 rounded bg-red-900/50 text-red-400"><i class="fa-solid fa-trash"></i></button></div></td>`
+                ? `<td class="p-4 text-center admin-only"><div class="flex justify-center gap-2"><button onclick='window.UI.modals.open("modal-pengeluaran", ${JSON.stringify(p).replace(/'/g, "\\'")})' class="w-8 h-8 rounded bg-blue-900/50 text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="window.App.crud.deleteData('pengeluaran', '${p.id}')" class="w-8 h-8 rounded bg-red-900/50 text-red-400"><i class="fa-solid fa-trash"></i></button></div></td>`
                 : "";
               tbody.innerHTML += `<tr><td class="p-4">${window.Utils.formatDate(p.tgl)}</td><td class="p-4 font-semibold">${p.keperluan}</td><td class="p-4 text-gray-400 text-sm max-w-xs truncate">${p.keterangan || "-"}</td><td class="p-4 text-right font-semibold text-red-400">${window.Utils.formatRupiah(p.nominal)}</td>${actions}</tr>`;
             });
@@ -2806,6 +2971,16 @@
                             <td class="p-4 text-right font-bold text-gold">${window.Utils.formatRupiah(row.saldo)}</td>
                         </tr>`;
           });
+
+          // Sync data rincian untuk cetak PDF Kitab Laporan
+          if (document.getElementById("thead-laporan-iuran-print")) {
+            document.getElementById("thead-laporan-iuran-print").innerHTML = document.getElementById("thead-iuran").innerHTML || "";
+            document.getElementById("tbody-laporan-iuran-print").innerHTML = document.getElementById("tbody-iuran").innerHTML || "";
+            document.getElementById("thead-laporan-pemasukan-print").innerHTML = document.getElementById("thead-pemasukan").innerHTML || "";
+            document.getElementById("tbody-laporan-pemasukan-print").innerHTML = document.getElementById("tbody-pemasukan").innerHTML || "";
+            document.getElementById("thead-laporan-pengeluaran-print").innerHTML = document.getElementById("thead-pengeluaran").innerHTML || "";
+            document.getElementById("tbody-laporan-pengeluaran-print").innerHTML = document.getElementById("tbody-pengeluaran").innerHTML || "";
+          }
         },
 
         initCharts: () => {
