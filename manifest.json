@@ -1,0 +1,21 @@
+{
+  "name": "Yayasan Ikatan Spiritual Indonesia (ISI)",
+  "short_name": "Yayasan ISI",
+  "description": "Aplikasi Manajemen Yayasan ISI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050a07",
+  "theme_color": "#050a07",
+  "icons": [
+    {
+      "src": "image/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "image/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

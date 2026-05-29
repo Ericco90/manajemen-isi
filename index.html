@@ -438,6 +438,8 @@
         }
       }
     </style>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#050a07" />
   </head>
   <body class="font-sans antialiased text-gray-200">
     <!-- GLOBAL LOADER -->
@@ -1749,7 +1751,7 @@
             minimumFractionDigits: 0,
           }).format(num),
         parseRupiah: (str) =>
-          parseInt(str.replace(/[^,\d]/g, "").toString() || 0, 10),
+          parseInt(String(str).replace(/[^0-9]/g, "") || "0", 10),
         formatDate: (dateStr) =>
           dateStr
             ? new Date(dateStr).toLocaleDateString("id-ID", {
@@ -2566,15 +2568,15 @@
           ).length;
           const totalIuran = window.App.data.iuran
             .filter((i) => i.status === "Lunas")
-            .reduce((sum, item) => sum + parseInt(item.nominal), 0);
+            .reduce((sum, item) => sum + window.Utils.parseRupiah(item.nominal), 0);
           const totalPemasukan =
             totalIuran +
             window.App.data.pemasukan.reduce(
-              (sum, item) => sum + parseInt(item.nominal),
+              (sum, item) => sum + window.Utils.parseRupiah(item.nominal),
               0,
             );
           const totalPengeluaran = window.App.data.pengeluaran.reduce(
-            (sum, item) => sum + parseInt(item.nominal),
+            (sum, item) => sum + window.Utils.parseRupiah(item.nominal),
             0,
           );
 
@@ -2999,16 +3001,16 @@
             outD = new Array(12).fill(0);
           window.App.data.iuran.forEach((i) => {
             if (i.tahun == cY && i.status === "Lunas")
-              inD[parseInt(i.bulan) - 1] += parseInt(i.nominal);
+              inD[parseInt(i.bulan) - 1] += window.Utils.parseRupiah(i.nominal);
           });
           window.App.data.pemasukan.forEach((p) => {
             const d = new Date(p.tgl);
-            if (d.getFullYear() == cY) inD[d.getMonth()] += parseInt(p.nominal);
+            if (d.getFullYear() == cY) inD[d.getMonth()] += window.Utils.parseRupiah(p.nominal);
           });
           window.App.data.pengeluaran.forEach((p) => {
             const d = new Date(p.tgl);
             if (d.getFullYear() == cY)
-              outD[d.getMonth()] += parseInt(p.nominal);
+              outD[d.getMonth()] += window.Utils.parseRupiah(p.nominal);
           });
 
           window.App.charts.finance = new Chart(
@@ -3105,6 +3107,16 @@
       };
 
       window.onload = window.App.init;
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
     </script>
   </body>
 </html>
