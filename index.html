@@ -1799,17 +1799,23 @@
       };
 
       const GAS_URL =
-        "https://script.google.com/macros/s/AKfycbxBW_T4ieNsUNzCQ88riA2id-NjKLGFNxdsAaZGKjgNuNMVOgjRsWkcrPxZ2TpKUYLV/exec";
+        "https://script.google.com/macros/s/AKfycbx50z21M3w1B-e_bKeZeSTf5FiafuQz4b0jqnHhsID9rBT2zxhlBocXXXMmsPnmOYKz/exec";
 
       window.DB = {
         isNetlify: GAS_URL.startsWith("http"),
 
         gasRequest: async (action, data = {}) => {
           try {
+            const authRole = sessionStorage.getItem("yisi_role");
+            const authUser = sessionStorage.getItem("yisi_user");
+            const authPass = sessionStorage.getItem("yisi_pass");
+            const reqBody = { action: action, payload: data };
+            if (authRole && authUser && authPass) reqBody.auth = { role: authRole, user: authUser, pass: authPass };
+
             const response = await fetch(GAS_URL, {
               method: "POST",
               headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: action, payload: data }),
+              body: JSON.stringify(reqBody),
             });
             const result = await response.json();
             if (result.status === "success") {
@@ -1948,33 +1954,10 @@
             } else {
               setTimeout(() => {
                 window.UI.setLoader(false);
-                if (
-                  role === "admin" &&
-                  user === "admin" &&
-                  pass === "admin123"
-                ) {
-                  resolve({
-                    success: true,
-                    name: "Admin Utama",
-                    role: "admin",
-                  });
-                } else if (role === "anggota") {
-                  let anggotas =
-                    JSON.parse(localStorage.getItem("yisi_anggota")) || [];
-                  let a = anggotas.find((x) => x.id === user);
-                  if (a && pass === "isi123")
-                    resolve({ success: true, name: a.nama, role: "anggota" });
-                  else
-                    resolve({
-                      success: false,
-                      message: "ID Anggota atau Passphrase tidak selaras.",
-                    });
-                } else {
-                  resolve({
-                    success: false,
-                    message: "Kredensial tidak valid.",
-                  });
-                }
+                resolve({
+                  success: false,
+                  message: "Login offline dinonaktifkan demi keamanan. Harap pastikan koneksi internet Anda aktif.",
+                });
               }, 800);
             }
           });
@@ -2128,30 +2111,34 @@
               const isAd = this.value === "admin";
               document.getElementById("label-user").textContent = isAd
                 ? "Username Admin"
-                : "ID Anggota (Misal: AGT-00001)";
+                : "Username Anggota";
               document.getElementById("icon-user").className = isAd
                 ? "fa-solid fa-user-shield"
-                : "fa-solid fa-user";
+                : "fa-solid fa-users";
               document.getElementById("login-user").placeholder = isAd
                 ? "Masukkan username"
-                : "Masukkan ID Anggota";
+                : "Masukkan username anggota";
               document.getElementById("login-user").value = isAd
                 ? "admin"
-                : "AGT-00001";
+                : "anggota";
               document.getElementById("login-pass").value = isAd
                 ? "admin123"
                 : "isi123";
             });
 
-          const loadedData = await window.DB.loadAll(false);
-          Object.assign(window.App.data, loadedData);
-
           if (sessionStorage.getItem("yisi_auth")) {
-            window.App.isAdmin =
-              sessionStorage.getItem("yisi_role") === "admin";
-            window.UI.applyRolePermissions();
-            window.UI.showLayout();
-            window.App.navigate("dashboard");
+            try {
+              const loadedData = await window.DB.loadAll(false);
+              Object.assign(window.App.data, loadedData);
+              window.App.isAdmin =
+                sessionStorage.getItem("yisi_role") === "admin";
+              window.UI.applyRolePermissions();
+              window.UI.showLayout();
+              window.App.navigate("dashboard");
+            } catch (error) {
+              sessionStorage.clear();
+              document.getElementById("view-login").classList.remove("hidden");
+            }
           } else {
             document.getElementById("view-login").classList.remove("hidden");
           }
@@ -2228,13 +2215,21 @@
                 sessionStorage.setItem("yisi_auth", "true");
                 sessionStorage.setItem("yisi_role", authResult.role);
                 sessionStorage.setItem("yisi_name", authResult.name);
+                sessionStorage.setItem("yisi_user", u);
+                sessionStorage.setItem("yisi_pass", p);
                 window.App.isAdmin = authResult.role === "admin";
                 window.UI.toast.success(
                   `Gerbang terbuka. Selamat datang ${authResult.name}.`,
                 );
-                window.UI.applyRolePermissions();
-                window.UI.showLayout();
-                window.App.navigate("dashboard");
+                try {
+                  const loadedData = await window.DB.loadAll(false);
+                  Object.assign(window.App.data, loadedData);
+                  window.UI.applyRolePermissions();
+                  window.UI.showLayout();
+                  window.App.navigate("dashboard");
+                } catch (error) {
+                  window.UI.toast.error("Gagal memuat data dari server.");
+                }
               } else {
                 window.UI.toast.error(
                   authResult.message || "Gagal masuk gerbang.",
