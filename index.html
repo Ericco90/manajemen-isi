@@ -1545,6 +1545,14 @@
             <div class="pt-4 flex justify-end gap-2">
               <button
                 type="button"
+                id="btn-delete-iuran"
+                class="hidden px-4 py-2 rounded text-red-400 bg-red-900/30 border border-red-500/30 hover:bg-red-500 hover:text-white transition text-sm mr-auto"
+                onclick="if(document.getElementById('iuran-id').value) { window.App.crud.deleteData('iuran', document.getElementById('iuran-id').value); document.getElementById('modal-iuran').classList.add('hidden'); }"
+              >
+                Hapus
+              </button>
+              <button
+                type="button"
                 class="close-modal px-4 py-2 rounded text-gray-400 hover:bg-white/5 text-sm"
               >
                 Batal
@@ -2332,38 +2340,49 @@
             const currentYear = String(new Date().getFullYear());
             const iuranMap = {};
             (window.App.data.iuran || []).forEach(i => {
-               if (String(i.tahun) === currentYear) {
-                  const key = `${i.id_anggota}_${parseInt(i.bulan)}`;
-                  if (!iuranMap[key] || i.status === "Lunas") {
-                     iuranMap[key] = i.status;
-                  }
+               const key = `${i.id_anggota}_${i.tahun}_${parseInt(i.bulan)}`;
+               if (!iuranMap[key] || i.status === "Lunas") {
+                  iuranMap[key] = i.status;
                }
             });
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
 
             resContainer.innerHTML = filtered.slice(0, 3).map(a => {
-              let iuranHtml = `<div class="grid grid-cols-6 gap-1 mt-3 w-full">`;
-              months.forEach((m, idx) => {
-                 const monthNum = idx + 1;
-                 const key = `${a.id}_${monthNum}`;
-                 const status = iuranMap[key];
-                 let bgClass = "bg-red-900/40 border-red-500/30 text-red-400";
-                 let icon = "fa-xmark";
-                 if (status === "Lunas") {
-                    bgClass = "bg-green-900/40 border-green-500/30 text-green-400";
-                    icon = "fa-check";
-                 } else if (status === "Belum Lunas") {
-                    bgClass = "bg-orange-900/40 border-orange-500/30 text-orange-400";
-                    icon = "fa-minus";
+              const memberYears = new Set([currentYear]);
+              (window.App.data.iuran || []).forEach(i => {
+                 if (i.id_anggota === a.id && parseInt(i.tahun) >= parseInt(currentYear)) {
+                    memberYears.add(String(i.tahun));
                  }
-                 iuranHtml += `
-                   <div class="flex flex-col items-center justify-center py-1 border rounded text-[10px] ${bgClass}" title="${m} ${currentYear}: ${status || 'Belum Setor'}">
-                     <span class="font-bold opacity-80">${m}</span>
-                     <i class="fa-solid ${icon} mt-1 text-xs"></i>
-                   </div>
-                 `;
               });
-              iuranHtml += `</div>`;
+              const sortedYears = Array.from(memberYears).sort((x, y) => parseInt(x) - parseInt(y));
+
+              let allIuranHtml = "";
+              sortedYears.forEach(year => {
+                 let iuranHtml = `<div class="text-[10px] text-gray-400 mt-3 font-bold border-b border-white/10 pb-1">Tahun ${year}</div>`;
+                 iuranHtml += `<div class="grid grid-cols-6 gap-1 mt-1 w-full">`;
+                 months.forEach((m, idx) => {
+                    const monthNum = idx + 1;
+                    const key = `${a.id}_${year}_${monthNum}`;
+                    const status = iuranMap[key];
+                    let bgClass = "bg-red-900/40 border-red-500/30 text-red-400";
+                    let icon = "fa-xmark";
+                    if (status === "Lunas") {
+                       bgClass = "bg-green-900/40 border-green-500/30 text-green-400";
+                       icon = "fa-check";
+                    } else if (status === "Belum Lunas") {
+                       bgClass = "bg-orange-900/40 border-orange-500/30 text-orange-400";
+                       icon = "fa-minus";
+                    }
+                    iuranHtml += `
+                      <div class="flex flex-col items-center justify-center py-1 border rounded text-[10px] ${bgClass}" title="${m} ${year}: ${status || 'Belum Setor'}">
+                        <span class="font-bold opacity-80">${m}</span>
+                        <i class="fa-solid ${icon} mt-1 text-xs"></i>
+                      </div>
+                    `;
+                 });
+                 iuranHtml += `</div>`;
+                 allIuranHtml += iuranHtml;
+              });
 
               return `
               <div class="glass p-3 rounded-lg flex flex-col border border-gold/20 hover:bg-white/5 transition cursor-default">
@@ -2374,7 +2393,7 @@
                     <p class="text-xs text-gray-300 truncate">${a.id} &bull; ${a.jabatan}</p>
                   </div>
                 </div>
-                ${iuranHtml}
+                ${allIuranHtml}
               </div>
             `}).join("");
           });
@@ -2621,12 +2640,19 @@
                     : data[key];
               }
             }
-            if (id === "modal-iuran" && !data) {
-              const d = new Date();
-              document.getElementById("iuran-bulan").value = String(
-                d.getMonth() + 1,
-              ).padStart(2, "0");
-              document.getElementById("iuran-tahun").value = d.getFullYear();
+            if (id === "modal-iuran") {
+              const btnDel = document.getElementById("btn-delete-iuran");
+              if (btnDel) {
+                if (data) btnDel.classList.remove("hidden");
+                else btnDel.classList.add("hidden");
+              }
+              if (!data) {
+                const d = new Date();
+                document.getElementById("iuran-bulan").value = String(
+                  d.getMonth() + 1,
+                ).padStart(2, "0");
+                document.getElementById("iuran-tahun").value = d.getFullYear();
+              }
             }
             document.getElementById(id).classList.remove("hidden");
           },
