@@ -754,6 +754,32 @@
               <div id="dashboard-search-results" class="w-full mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 empty:hidden"></div>
             </div>
 
+            <!-- Ruang Informasi -->
+            <div class="glass-card p-5 rounded-xl border border-gold/20">
+              <div class="flex flex-col sm:flex-row justify-between gap-4 items-center mb-4 border-b border-white/10 pb-2">
+                <h3 class="font-cinzel text-gold flex items-center gap-2">
+                  <i class="fa-solid fa-bullhorn"></i> Ruang Informasi & Peraturan
+                </h3>
+                <button onclick="window.UI.modals.open('modal-informasi')" class="admin-only w-full sm:w-auto bg-gold text-mystic-900 font-semibold px-4 py-2 rounded-lg hover:bg-gold-light transition shadow-[0_0_10px_rgba(212,175,55,0.3)] text-sm">
+                  <i class="fa-solid fa-plus mr-2"></i>Tambah Informasi
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse mystic-table text-sm">
+                  <thead>
+                    <tr>
+                      <th class="p-3 w-1/4">Tanggal</th>
+                      <th class="p-3 w-1/3">Judul Informasi / Peraturan</th>
+                      <th class="p-3 w-5/12 text-center">Gambar Dokumen</th>
+                      <th class="p-3 w-1/12 text-center admin-only">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-informasi">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div
@@ -1716,6 +1742,38 @@
         </div>
       </div>
 
+      <div id="modal-informasi" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[90]">
+        <div class="glass-card w-full max-w-md rounded-xl p-6 relative animate-slide-up">
+          <button type="button" class="close-modal absolute top-4 right-4 text-gray-400 hover:text-white">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+          <h3 class="font-cinzel text-xl text-gold mb-4 border-b border-white/10 pb-2">Tambah Informasi / Peraturan</h3>
+          <form id="form-informasi" class="space-y-4">
+            <input type="hidden" id="informasi-id" />
+            <div>
+              <label class="text-xs text-gray-400">Tanggal</label>
+              <input type="date" id="informasi-tanggal" class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm" required />
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Judul Informasi</label>
+              <input type="text" id="informasi-judul" class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm" required />
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Keterangan Singkat</label>
+              <textarea id="informasi-keterangan" class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm" rows="2"></textarea>
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">URL Gambar Dokumen</label>
+              <input type="url" id="informasi-gambar" class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm" placeholder="https://..." required />
+            </div>
+            <div class="pt-4 flex justify-end gap-2">
+              <button type="button" class="close-modal px-4 py-2 rounded text-gray-400 hover:bg-white/5 text-sm">Batal</button>
+              <button type="submit" class="px-4 py-2 rounded bg-gold text-mystic-900 font-semibold text-sm hover:bg-gold-light">Simpan Informasi</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Image Viewer Modal -->
       <div
         id="modal-image-viewer"
@@ -1890,6 +1948,7 @@
                   "pemasukan",
                   "pengeluaran",
                   "struktur",
+                  "informasi",
                 ];
                 let result = {};
                 tables.forEach(
@@ -2113,6 +2172,7 @@
           pemasukan: [],
           pengeluaran: [],
           struktur: [],
+          informasi: [],
         },
         charts: { finance: null, iuran: null },
         isAdmin: false,
@@ -2188,6 +2248,7 @@
           window.UI.renderPemasukan();
           window.UI.renderPengeluaran();
           window.UI.renderLaporan();
+          window.UI.renderInformasi();
         },
 
         navigate: (viewId) => {
@@ -2323,6 +2384,10 @@
           document
             .getElementById("form-struktur")
             .addEventListener("submit", window.App.crud.saveStruktur);
+          const formInfo = document.getElementById("form-informasi");
+          if (formInfo) {
+            formInfo.addEventListener("submit", window.App.crud.saveInformasi);
+          }
 
           document.getElementById("search-dashboard").addEventListener("input", (e) => {
             const val = e.target.value.toLowerCase().trim();
@@ -2524,6 +2589,24 @@
             await window.DB.saveItem("pengeluaran", data);
             window.UI.modals.close("modal-pengeluaran");
             window.UI.toast.success("Pengeluaran dicatat.");
+            window.App.refreshAll();
+          },
+          saveInformasi: async (e) => {
+            e.preventDefault();
+            const id = document.getElementById("informasi-id").value || window.Utils.generateId("INF");
+            const fotoInput = window.Utils.convertDriveLink(
+              document.getElementById("informasi-gambar")?.value,
+            );
+            const data = {
+              id,
+              tanggal: document.getElementById("informasi-tanggal").value,
+              judul: document.getElementById("informasi-judul").value,
+              keterangan: document.getElementById("informasi-keterangan").value,
+              gambar: fotoInput
+            };
+            await window.DB.saveItem("informasi", data);
+            window.UI.modals.close("modal-informasi");
+            window.UI.toast.success("Informasi berhasil disimpan.");
             window.App.refreshAll();
           },
           deleteData: (table, id) => {
@@ -2992,6 +3075,48 @@
                 : "";
               tbody.innerHTML += `<tr><td class="p-4">${window.Utils.formatDate(p.tgl)}</td><td class="p-4 font-semibold">${p.keperluan}</td><td class="p-4 text-gray-400 text-sm max-w-xs truncate">${p.keterangan || "-"}</td><td class="p-4 text-right font-semibold text-red-400">${window.Utils.formatRupiah(p.nominal)}</td>${actions}</tr>`;
             });
+        },
+
+        renderInformasi: () => {
+          const tbody = document.getElementById("tbody-informasi");
+          if (!tbody) return;
+          tbody.innerHTML = "";
+          let data = [...(window.App.data.informasi || [])].sort(
+            (a, b) => new Date(b.tanggal) - new Date(a.tanggal)
+          );
+          if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${window.App.isAdmin ? 4 : 3}" class="p-8 text-center text-gray-500">Belum ada informasi.</td></tr>`;
+          } else {
+            data.forEach((inf) => {
+              const actions = window.App.isAdmin
+                ? `<td class="p-3 align-middle text-center admin-only">
+                     <div class="flex justify-center gap-2">
+                       <button onclick='window.UI.modals.open("modal-informasi", ${JSON.stringify(inf).replace(/'/g, "\\'")})' class="w-8 h-8 rounded bg-blue-900/50 text-blue-400"><i class="fa-solid fa-pen"></i></button>
+                       <button onclick="window.App.crud.deleteData('informasi', '${inf.id}')" class="w-8 h-8 rounded bg-red-900/50 text-red-400"><i class="fa-solid fa-trash"></i></button>
+                     </div>
+                   </td>`
+                : "";
+              tbody.innerHTML += `<tr class="hover:bg-white/5 transition">
+                <td class="p-3 align-middle text-gray-300">${window.Utils.formatDate(inf.tanggal)}</td>
+                <td class="p-3 align-middle">
+                  <p class="font-semibold text-pupus mb-1">${inf.judul}</p>
+                  <p class="text-xs text-gray-400">${inf.keterangan || "-"}</p>
+                </td>
+                <td class="p-3 align-middle text-center">
+                  <div onclick="window.UI.viewImage('${inf.gambar}', '${inf.judul.replace(/'/g, "\\'")}', '${inf.keterangan.replace(/'/g, "\\'")}')" class="w-32 h-20 bg-mystic-800 rounded border border-white/10 mx-auto flex items-center justify-center relative group cursor-pointer overflow-hidden">
+                    <img src="${inf.gambar}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div style="display:none" class="absolute inset-0 flex items-center justify-center">
+                        <i class="fa-solid fa-image text-2xl text-gray-500 group-hover:text-gold transition"></i>
+                    </div>
+                    <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                      <span class="text-xs text-gold border border-gold px-2 py-1 rounded">Lihat</span>
+                    </div>
+                  </div>
+                </td>
+                ${actions}
+              </tr>`;
+            });
+          }
         },
 
         renderLaporan: () => {
