@@ -1793,7 +1793,10 @@
           </button>
           <img id="viewer-img" src="" alt="View" class="w-full h-auto max-h-[85vh] object-contain rounded-lg mb-4 bg-mystic-900/50 border border-gold/20">
           <h3 class="text-xl font-cinzel font-bold text-gold mb-1" id="viewer-title">Judul</h3>
-          <p class="text-sm text-pupus" id="viewer-desc">Keterangan</p>
+          <p class="text-sm text-pupus mb-3" id="viewer-desc">Keterangan</p>
+          <a id="viewer-link" href="#" target="_blank" class="inline-block px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition border border-white/10">
+            <i class="fa-solid fa-up-right-from-square mr-2"></i>Buka Ukuran Penuh
+          </a>
         </div>
       </div>
 
@@ -2622,6 +2625,8 @@
       window.UI = {
         viewImage: (url, title, desc) => {
           document.getElementById('viewer-img').src = url;
+          const linkBtn = document.getElementById('viewer-link');
+          if (linkBtn) linkBtn.href = url;
           document.getElementById('viewer-title').textContent = title;
           document.getElementById('viewer-desc').textContent = desc;
           document.getElementById('modal-image-viewer').classList.remove('hidden');
