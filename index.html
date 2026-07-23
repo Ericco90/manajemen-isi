@@ -1777,29 +1777,22 @@
       <!-- Image Viewer Modal -->
       <div
         id="modal-image-viewer"
-        class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[100]"
+        class="fixed inset-0 modal-overlay hidden flex flex-col items-center justify-start p-0 z-[100] overflow-y-auto custom-scrollbar"
         onclick="this.classList.add('hidden')"
       >
-        <div
-          class="glass-card w-[95vw] md:max-w-4xl rounded-xl p-4 text-center animate-slide-up relative"
-          onclick="event.stopPropagation()"
+        <button
+          type="button"
+          class="fixed top-4 right-4 text-white hover:text-gold bg-black/60 border border-white/20 w-10 h-10 rounded-full flex items-center justify-center z-[110] shadow-xl backdrop-blur-sm transition"
+          onclick="document.getElementById('modal-image-viewer').classList.add('hidden')"
         >
-          <button
-            type="button"
-            class="absolute top-3 right-3 text-gray-400 hover:text-white bg-mystic-900 border border-white/10 w-8 h-8 rounded-full flex items-center justify-center z-10"
-            onclick="document.getElementById('modal-image-viewer').classList.add('hidden')"
-          >
-            <i class="fa-solid fa-xmark text-lg"></i>
-          </button>
-          <h3 class="text-xl font-cinzel font-bold text-gold mb-1 mt-1 pr-6" id="viewer-title">Judul</h3>
-          <p class="text-sm text-pupus mb-3 pr-6" id="viewer-desc">Keterangan</p>
-          <div class="w-full max-h-[65vh] overflow-y-auto rounded-lg mb-4 border border-gold/20 bg-mystic-900/50 custom-scrollbar relative">
-            <img id="viewer-img" src="" alt="View" class="w-full h-auto block relative z-0">
-          </div>
-          <a id="viewer-link" href="#" target="_blank" class="inline-block px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition border border-white/10">
-            <i class="fa-solid fa-up-right-from-square mr-2"></i>Buka Ukuran Penuh
-          </a>
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        <div class="w-full md:max-w-5xl min-h-screen flex items-center justify-center p-0 md:p-4" onclick="event.stopPropagation()">
+            <img id="viewer-img" src="" alt="View" class="w-full h-auto shadow-2xl rounded-none md:rounded-lg">
         </div>
+        <div class="hidden" id="viewer-title"></div>
+        <div class="hidden" id="viewer-desc"></div>
+        <a class="hidden" id="viewer-link"></a>
       </div>
 
       <!-- Custom Confirm Modal -->
