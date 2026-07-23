@@ -3082,12 +3082,19 @@
           if (!tbody) return;
           tbody.innerHTML = "";
           let data = [...(window.App.data.informasi || [])].sort(
-            (a, b) => new Date(b.tanggal) - new Date(a.tanggal)
+            (a, b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0)
           );
+          
+          // Filter out empty rows from Google Sheets that might just have IDs but no real data
+          data = data.filter(inf => inf.judul || inf.gambar);
+
           if (data.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${window.App.isAdmin ? 4 : 3}" class="p-8 text-center text-gray-500">Belum ada informasi.</td></tr>`;
           } else {
             data.forEach((inf) => {
+              const safeJudul = String(inf.judul || "").replace(/'/g, "\\'");
+              const safeKeterangan = String(inf.keterangan || "").replace(/'/g, "\\'");
+              
               const actions = window.App.isAdmin
                 ? `<td class="p-3 align-middle text-center admin-only">
                      <div class="flex justify-center gap-2">
@@ -3099,11 +3106,11 @@
               tbody.innerHTML += `<tr class="hover:bg-white/5 transition">
                 <td class="p-3 align-middle text-gray-300">${window.Utils.formatDate(inf.tanggal)}</td>
                 <td class="p-3 align-middle">
-                  <p class="font-semibold text-pupus mb-1">${inf.judul}</p>
+                  <p class="font-semibold text-pupus mb-1">${inf.judul || "-"}</p>
                   <p class="text-xs text-gray-400">${inf.keterangan || "-"}</p>
                 </td>
                 <td class="p-3 align-middle text-center">
-                  <div onclick="window.UI.viewImage('${inf.gambar}', '${inf.judul.replace(/'/g, "\\'")}', '${inf.keterangan.replace(/'/g, "\\'")}')" class="w-32 h-20 bg-mystic-800 rounded border border-white/10 mx-auto flex items-center justify-center relative group cursor-pointer overflow-hidden">
+                  <div onclick="window.UI.viewImage('${inf.gambar}', '${safeJudul}', '${safeKeterangan}')" class="w-32 h-20 bg-mystic-800 rounded border border-white/10 mx-auto flex items-center justify-center relative group cursor-pointer overflow-hidden">
                     <img src="${inf.gambar}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                     <div style="display:none" class="absolute inset-0 flex items-center justify-center">
                         <i class="fa-solid fa-image text-2xl text-gray-500 group-hover:text-gold transition"></i>
