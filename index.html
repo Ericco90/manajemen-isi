@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -27,30 +27,35 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ["Poppins", "sans-serif"],
+              sans: ["Outfit", "sans-serif"],
               cinzel: ["Cinzel", "serif"],
             },
             colors: {
               mystic: {
-                900: "#050a07",
-                800: "#0a1710",
-                700: "#11261b",
+                950: "#020617",
+                900: "#0f172a",
+                800: "#1e293b",
+                700: "#334155",
               },
               pupus: {
-                light: "#d6ebd0",
-                DEFAULT: "#B2D2A4",
-                dark: "#8bb579",
+                light: "#67e8f9",
+                DEFAULT: "#06b6d4",
+                dark: "#0891b2",
               },
               gold: {
-                light: "#f5d76e",
-                DEFAULT: "#D4AF37",
-                dark: "#aa8c2c",
+                light: "#d8b4fe",
+                DEFAULT: "#a855f7",
+                dark: "#7e22ce",
               },
+              blood: {
+                DEFAULT: "#ec4899",
+                dark: "#be185d",
+              }
             },
             animation: {
-              "fade-in": "fadeIn 0.5s ease-out",
+              "fade-in": "fadeIn 0.4s ease-out",
               "slide-up": "slideUp 0.4s ease-out",
-              "pulse-glow": "pulseGlow 2s infinite",
+              "float": "float 6s infinite ease-in-out",
             },
             keyframes: {
               fadeIn: {
@@ -61,9 +66,9 @@
                 "0%": { transform: "translateY(20px)", opacity: "0" },
                 "100%": { transform: "translateY(0)", opacity: "1" },
               },
-              pulseGlow: {
-                "0%, 100%": { boxShadow: "0 0 10px rgba(212, 175, 55, 0.2)" },
-                "50%": { boxShadow: "0 0 20px rgba(212, 175, 55, 0.6)" },
+              float: {
+                "0%, 100%": { transform: "translateY(0)" },
+                "50%": { transform: "translateY(-10px)" },
               },
             },
           },
@@ -77,76 +82,86 @@
     <style>
       /* Base styles */
       body {
-        background-color: #050a07;
-        background-image:
-          radial-gradient(
-            circle at 15% 50%,
-            rgba(178, 210, 164, 0.05),
-            transparent 25%
-          ),
-          radial-gradient(
-            circle at 85% 30%,
-            rgba(212, 175, 55, 0.05),
-            transparent 25%
-          );
+        background-color: #020617;
+        background-image: 
+          radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.1), transparent 25%),
+          radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.1), transparent 25%);
+        background-attachment: fixed;
         color: #e2e8f0;
         overflow-x: hidden;
       }
 
-      /* Glassmorphism Classes */
+      /* Futuristic Glass Panels */
       .glass {
-        background: rgba(10, 23, 16, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(178, 210, 164, 0.1);
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(6, 182, 212, 0.15);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
       }
 
       .glass-card {
-        background: linear-gradient(
-          145deg,
-          rgba(17, 38, 27, 0.8) 0%,
-          rgba(10, 23, 16, 0.9) 100%
-        );
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(212, 175, 55, 0.15);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        transition: all 0.3s ease;
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        border-top: 1px solid rgba(6, 182, 212, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .glass-card:hover {
-        border-color: rgba(212, 175, 55, 0.4);
-        box-shadow: 0 8px 32px 0 rgba(212, 175, 55, 0.1);
-        transform: translateY(-2px);
+        border-color: rgba(168, 85, 247, 0.6);
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        transform: translateY(-3px);
       }
 
       /* Forms & Inputs */
       .mystic-input {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(178, 210, 164, 0.2);
-        color: #fff;
-        transition: all 0.3s;
+        background: rgba(2, 6, 23, 0.7);
+        border: 1px solid rgba(51, 65, 85, 0.8);
+        color: #f8fafc;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(8px);
       }
       .mystic-input:focus {
         outline: none;
-        border-color: #d4af37;
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        border-color: #06b6d4;
+        background: rgba(15, 23, 42, 0.9);
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
       }
 
       /* Scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #050a07;
+        background: #020617;
       }
       ::-webkit-scrollbar-thumb {
-        background: #11261b;
+        background: #334155;
         border-radius: 4px;
-        border: 1px solid rgba(178, 210, 164, 0.2);
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #b2d2a4;
+        background: #06b6d4;
+      }
+
+      /* Glow Effects */
+      .glow-blink-red {
+        color: #ff4d4d;
+        animation: glowBlinkRed 1.5s infinite ease-in-out;
+      }
+      @keyframes glowBlinkRed {
+        0%, 100% { opacity: 1; text-shadow: 0 0 5px #cc0000, 0 0 10px #ff4d4d; }
+        50% { opacity: 0.4; text-shadow: 0 0 2px #cc0000, 0 0 5px #cc0000; }
+      }
+      .glow-blink-white {
+        animation: glowBlinkWhite 1.5s infinite ease-in-out;
+      }
+      @keyframes glowBlinkWhite {
+        0%, 100% { opacity: 1; text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff; }
+        50% { opacity: 0.5; text-shadow: 0 0 2px #ffffff, 0 0 5px #ffffff; }
       }
 
       /* Hide elements */
@@ -156,40 +171,43 @@
 
       /* Table Styles */
       .mystic-table th {
-        background: rgba(17, 38, 27, 0.9);
-        color: #d4af37;
-        font-weight: 600;
+        background: rgba(15, 23, 42, 0.9);
+        color: #06b6d4;
+        font-weight: 500;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 0.8rem;
+        letter-spacing: 1.5px;
+        font-size: 0.75rem;
+        border-bottom: 1px solid rgba(6, 182, 212, 0.3);
       }
       .mystic-table tr {
-        border-bottom: 1px solid rgba(178, 210, 164, 0.1);
-        transition: background 0.2s;
+        border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+        transition: background 0.2s ease;
       }
       .mystic-table tr:hover {
-        background: rgba(178, 210, 164, 0.05);
+        background: rgba(30, 41, 59, 0.6);
       }
 
       /* Toast */
       #toast-container {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
+        bottom: 24px;
+        right: 24px;
         z-index: 9999;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
       }
       .toast {
-        padding: 12px 24px;
-        border-radius: 8px;
+        padding: 16px 24px;
+        border-radius: 12px;
         color: white;
         display: flex;
         align-items: center;
-        gap: 10px;
-        animation: slideUp 0.3s forwards;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        gap: 12px;
+        backdrop-filter: blur(10px);
+        animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
       .toast.success {
         background: linear-gradient(to right, #11261b, #1e402d);
@@ -437,6 +455,16 @@
           display: none !important;
         }
       }
+
+      /* AI Cyberpunk Overrides */
+      #view-login .absolute.inset-0 {
+        background-color: rgba(2, 6, 23, 0.85) !important;
+      }
+      #logo-yayasan {
+        border-color: #06b6d4 !important;
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.5) !important;
+        filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4));
+      }
     </style>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#050a07" />
@@ -482,52 +510,46 @@
               class="w-20 h-20 rounded-full border-2 border-gold shadow-[0_0_15px_rgba(212,175,55,0.5)] object-cover"
             />
           </div>
-          <h1 class="font-cinzel text-2xl text-gold font-bold tracking-wider">
+          <h1 class="font-cinzel text-2xl text-[#39ff14] font-bold tracking-wider drop-shadow-[0_0_8px_rgba(57,255,20,0.4)]">
             YAYASAN I.S.I
           </h1>
-          <p class="text-sm text-pupus mt-1 opacity-80">
+          <p class="text-sm text-yellow-400 font-semibold mt-1 tracking-wide drop-shadow-[0_0_3px_rgba(250,204,21,0.6)]">
             Ikatan Spiritual Indonesia
           </p>
           <div
-            class="h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-4"
+            class="h-px w-32 bg-gradient-to-r from-transparent via-cyan-500 to-transparent mx-auto mt-5 mb-4"
           ></div>
+          <div class="px-2 text-[11px] text-gray-300 font-sans tracking-wide leading-relaxed space-y-3 mt-4 mb-2">
+            <p><strong class="font-cinzel text-xs uppercase tracking-widest block mb-1 glow-blink-red">Visi</strong> Menjadi organisasi spiritual terbesar, terpercaya, dan legal di Indonesia.</p>
+            <div>
+              <strong class="font-cinzel text-xs uppercase tracking-widest block mb-1 glow-blink-red">Misi</strong>
+              <ul class="list-none space-y-1 text-left inline-block">
+                <li><i class="fa-solid fa-chevron-right text-[8px] text-purple-500 mr-1.5 opacity-80"></i>Menyatukan seluruh pelaku spiritual Indonesia</li>
+                <li><i class="fa-solid fa-chevron-right text-[8px] text-purple-500 mr-1.5 opacity-80"></i>Membantu legalitas dan pengembangan anggota</li>
+                <li><i class="fa-solid fa-chevron-right text-[8px] text-purple-500 mr-1.5 opacity-80"></i>Menjalin persaudaraan dan solidaritas</li>
+                <li><i class="fa-solid fa-chevron-right text-[8px] text-purple-500 mr-1.5 opacity-80"></i>Menjadi wadah edukasi spiritual modern</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <form id="login-form" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-1"
-              >Akses Masuk</label
-            >
-            <div class="relative">
-              <span
-                class="absolute inset-y-0 left-0 flex items-center pl-3 text-gold"
-                ><i class="fa-solid fa-door-open"></i
-              ></span>
-              <select
-                id="login-role"
-                class="mystic-input w-full pl-10 pr-4 py-2.5 rounded-lg text-sm appearance-none"
-              >
-                <option value="admin">Admin</option>
-                <option value="anggota">Anggota</option>
-              </select>
-            </div>
-          </div>
-          <div>
             <label
               class="block text-sm font-medium text-gray-400 mb-1"
               id="label-user"
-              >Username Admin</label
+              >Username / ID Anggota</label
             >
             <div class="relative">
               <span
                 class="absolute inset-y-0 left-0 flex items-center pl-3 text-gold"
-                ><i class="fa-solid fa-user-shield" id="icon-user"></i
+                ><i class="fa-solid fa-user" id="icon-user"></i
               ></span>
               <input
                 type="text"
                 id="login-user"
                 class="mystic-input w-full pl-10 pr-4 py-2.5 rounded-lg text-sm"
-                placeholder="Masukkan username"
+                placeholder="Masukkan username atau ID"
                 required
               />
             </div>
@@ -757,7 +779,7 @@
             <!-- Ruang Informasi -->
             <div class="glass-card p-5 rounded-xl border border-gold/20">
               <div class="flex flex-col sm:flex-row justify-between gap-4 items-center mb-4 border-b border-white/10 pb-2">
-                <h3 class="font-cinzel text-gold flex items-center gap-2">
+                <h3 class="font-sans font-bold uppercase tracking-wide text-red-500 flex items-center gap-2 animate-pulse">
                   <i class="fa-solid fa-bullhorn"></i> Ruang Informasi & Peraturan
                 </h3>
                 <button onclick="window.UI.modals.open('modal-informasi')" class="admin-only w-full sm:w-auto bg-gold text-mystic-900 font-semibold px-4 py-2 rounded-lg hover:bg-gold-light transition shadow-[0_0_10px_rgba(212,175,55,0.3)] text-sm">
@@ -1787,11 +1809,11 @@
         >
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
-        <div class="w-full md:max-w-5xl min-h-screen flex items-center justify-center p-0 md:p-4" onclick="event.stopPropagation()">
-            <img id="viewer-img" src="" alt="View" class="w-full h-auto shadow-2xl rounded-none md:rounded-lg">
+        <div class="w-full md:max-w-3xl min-h-screen flex flex-col items-center justify-center p-4" onclick="event.stopPropagation()">
+            <img id="viewer-img" src="" alt="View" class="max-w-full max-h-[60vh] w-auto h-auto object-contain shadow-[0_0_30px_rgba(6,182,212,0.3)] rounded-lg border border-cyan-500/50">
+            <div class="text-cyan-400 text-3xl font-bold mt-6 font-cinzel text-center tracking-wider" id="viewer-title"></div>
+            <div class="text-purple-400 text-xl mt-2 text-center" id="viewer-desc"></div>
         </div>
-        <div class="hidden" id="viewer-title"></div>
-        <div class="hidden" id="viewer-desc"></div>
         <a class="hidden" id="viewer-link"></a>
       </div>
 
@@ -2195,26 +2217,7 @@
             });
           });
 
-          document
-            .getElementById("login-role")
-            .addEventListener("change", function () {
-              const isAd = this.value === "admin";
-              document.getElementById("label-user").textContent = isAd
-                ? "Username Admin"
-                : "Username Anggota";
-              document.getElementById("icon-user").className = isAd
-                ? "fa-solid fa-user-shield"
-                : "fa-solid fa-users";
-              document.getElementById("login-user").placeholder = isAd
-                ? "Masukkan username"
-                : "Masukkan username anggota";
-              document.getElementById("login-user").value = isAd
-                ? "admin"
-                : "anggota";
-              document.getElementById("login-pass").value = isAd
-                ? "admin123"
-                : "isi123";
-            });
+          // Auto-fill role logic removed
 
           if (sessionStorage.getItem("yisi_auth")) {
             try {
@@ -2296,11 +2299,20 @@
             .getElementById("login-form")
             .addEventListener("submit", async (e) => {
               e.preventDefault();
-              const role = document.getElementById("login-role").value;
               const u = document.getElementById("login-user").value;
               const p = document.getElementById("login-pass").value;
 
-              const authResult = await window.DB.authenticate(u, p, role);
+              let role = u.toLowerCase().includes('admin') ? 'admin' : 'anggota';
+              let authResult = await window.DB.authenticate(u, p, role);
+              
+              if (!authResult.success && !authResult.message.includes("dinonaktifkan")) {
+                const otherRole = role === 'admin' ? 'anggota' : 'admin';
+                const try2 = await window.DB.authenticate(u, p, otherRole);
+                if (try2.success) {
+                  authResult = try2;
+                  role = otherRole;
+                }
+              }
 
               if (authResult.success) {
                 sessionStorage.setItem("yisi_auth", "true");
@@ -3241,14 +3253,15 @@
         },
 
         initCharts: () => {
-          Chart.defaults.color = "rgba(255, 255, 255, 0.5)";
-          Chart.defaults.font.family = "Poppins";
+          Chart.defaults.color = "rgba(148, 163, 184, 0.8)";
+          Chart.defaults.font.family = "Outfit";
           if (window.App.charts.finance) window.App.charts.finance.destroy();
           if (window.App.charts.iuran) window.App.charts.iuran.destroy();
 
           const cY = new Date().getFullYear();
           let inD = new Array(12).fill(0),
             outD = new Array(12).fill(0);
+          
           window.App.data.iuran.forEach((i) => {
             if (i.tahun == cY && i.status === "Lunas")
               inD[parseInt(i.bulan) - 1] += window.Utils.parseRupiah(i.nominal);
@@ -3268,34 +3281,33 @@
             {
               type: "line",
               data: {
-                labels: [
-                  "Jan",
-                  "Feb",
-                  "Mar",
-                  "Apr",
-                  "Mei",
-                  "Jun",
-                  "Jul",
-                  "Ags",
-                  "Sep",
-                  "Okt",
-                  "Nov",
-                  "Des",
-                ],
+                labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"],
                 datasets: [
                   {
                     label: "Pemasukan",
                     data: inD,
-                    borderColor: "#B2D2A4",
-                    backgroundColor: "rgba(178, 210, 164, 0.1)",
+                    borderColor: "#06b6d4",
+                    backgroundColor: "rgba(6, 182, 212, 0.15)",
+                    pointBackgroundColor: "#020617",
+                    pointBorderColor: "#06b6d4",
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: "#06b6d4",
+                    pointHoverBorderColor: "#fff",
                     fill: true,
                     tension: 0.4,
                   },
                   {
                     label: "Pengeluaran",
                     data: outD,
-                    borderColor: "#ef4444",
-                    backgroundColor: "rgba(239, 68, 68, 0.1)",
+                    borderColor: "#ec4899",
+                    backgroundColor: "rgba(236, 72, 153, 0.15)",
+                    pointBackgroundColor: "#020617",
+                    pointBorderColor: "#ec4899",
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: "#ec4899",
+                    pointHoverBorderColor: "#fff",
                     fill: true,
                     tension: 0.4,
                   },
@@ -3304,11 +3316,37 @@
               options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { position: "bottom" } },
+                plugins: { 
+                  legend: { position: "bottom" },
+                  tooltip: {
+                    backgroundColor: "rgba(15, 23, 42, 0.9)",
+                    titleColor: "#06b6d4",
+                    bodyColor: "#f8fafc",
+                    borderColor: "rgba(6, 182, 212, 0.3)",
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                      label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) label += ': ';
+                        if (context.parsed.y !== null) {
+                          label += window.Utils.formatRupiah(context.parsed.y);
+                        }
+                        return label;
+                      }
+                    }
+                  }
+                },
                 scales: {
                   y: {
                     beginAtZero: true,
                     grid: { color: "rgba(255,255,255,0.05)" },
+                    ticks: {
+                      callback: function(value) {
+                        return "Rp " + (value / 1000) + "k";
+                      }
+                    }
                   },
                   x: { grid: { display: false } },
                 },
@@ -3339,17 +3377,27 @@
                 datasets: [
                   {
                     data: [pM, belum],
-                    backgroundColor: ["#D4AF37", "rgba(255,255,255,0.1)"],
-                    borderColor: ["#11261b", "#11261b"],
-                    borderWidth: 2,
+                    backgroundColor: ["#06b6d4", "rgba(15, 23, 42, 0.5)"],
+                    borderColor: ["#020617", "#020617"],
+                    borderWidth: 3,
+                    hoverOffset: 4
                   },
                 ],
               },
               options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: "70%",
-                plugins: { legend: { position: "bottom" } },
+                cutout: "75%",
+                plugins: { 
+                  legend: { position: "bottom" },
+                  tooltip: {
+                    backgroundColor: "rgba(15, 23, 42, 0.9)",
+                    titleColor: "#06b6d4",
+                    bodyColor: "#f8fafc",
+                    borderColor: "rgba(6, 182, 212, 0.3)",
+                    borderWidth: 1,
+                  }
+                },
               },
             },
           );
