@@ -923,12 +923,45 @@
                     if(file) {
                       const reader = new FileReader();
                       reader.onload = function(e) {
-                        const img = document.getElementById('qris-image-preview');
-                        const empty = document.getElementById('qris-empty-state');
+                        const img = new Image();
+                        img.onload = function() {
+                          const canvas = document.createElement('canvas');
+                          let w = img.width, h = img.height;
+                          if (w > 500 || h > 500) {
+                            if (w > h) { h = Math.round((500 / w) * h); w = 500; }
+                            else { w = Math.round((500 / h) * w); h = 500; }
+                          }
+                          canvas.width = w; canvas.height = h;
+                          const ctx = canvas.getContext('2d');
+                          // Fill white background for transparency (since we use JPEG)
+                          ctx.fillStyle = '#ffffff';
+                          ctx.fillRect(0, 0, w, h);
+                          ctx.drawImage(img, 0, 0, w, h);
+                          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                          
+                          const previewImg = document.getElementById('qris-image-preview');
+                          const empty = document.getElementById('qris-empty-state');
+                          previewImg.src = dataUrl;
+                          previewImg.classList.remove('hidden');
+                          if(empty) empty.classList.add('hidden');
+                          
+                          localStorage.setItem('qrisImage', dataUrl);
+                          window.DB.saveItem('informasi', {
+                            id: 'qris_img',
+                            tanggal: new Date().toISOString().split('T')[0],
+                            judul: 'QRIS_YAYASAN',
+                            keterangan: 'QRIS Data',
+                            gambar: dataUrl
+                          }).then(() => {
+                            if(window.App.data && window.App.data.informasi) {
+                               const idx = window.App.data.informasi.findIndex(x => x.id === 'qris_img');
+                               if(idx > -1) window.App.data.informasi[idx].gambar = dataUrl;
+                               else window.App.data.informasi.push({id: 'qris_img', tanggal: new Date().toISOString().split('T')[0], judul: 'QRIS_YAYASAN', gambar: dataUrl});
+                            }
+                            window.UI.toast.success("QRIS tersimpan permanen");
+                          });
+                        };
                         img.src = e.target.result;
-                        img.classList.remove('hidden');
-                        if(empty) empty.classList.add('hidden');
-                        localStorage.setItem('qrisImage', e.target.result);
                       }
                       reader.readAsDataURL(file);
                     }
@@ -2898,6 +2931,18 @@
           }
           window.UI.initCharts();
           window.UI.renderInformasi();
+          
+          const qrisData = (window.App.data.informasi || []).find(i => i.id === 'qris_img');
+          if (qrisData && qrisData.gambar) {
+            const previewImg = document.getElementById('qris-image-preview');
+            const empty = document.getElementById('qris-empty-state');
+            if (previewImg) {
+              previewImg.src = qrisData.gambar;
+              previewImg.classList.remove('hidden');
+              if (empty) empty.classList.add('hidden');
+              localStorage.setItem('qrisImage', qrisData.gambar);
+            }
+          }
         },
 
         renderStruktur: () => {
@@ -3153,7 +3198,7 @@
           );
           
           // Filter out empty rows from Google Sheets that might just have IDs but no real data
-          data = data.filter(inf => inf.judul || inf.gambar);
+          data = data.filter(inf => (inf.judul || inf.gambar) && inf.id !== 'qris_img');
 
           if (data.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${window.App.isAdmin ? 4 : 3}" class="p-8 text-center text-gray-500">Belum ada informasi.</td></tr>`;
