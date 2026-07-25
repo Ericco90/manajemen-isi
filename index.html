@@ -898,16 +898,62 @@
                   <canvas id="financeChart"></canvas>
                 </div>
               </div>
-              <div class="glass-card p-5 rounded-xl">
+              <div class="glass-card p-5 rounded-xl flex flex-col h-full">
                 <h4
-                  class="font-cinzel text-pupus mb-4 border-b border-white/10 pb-2"
+                  class="font-cinzel text-pupus mb-4 border-b border-white/10 pb-2 flex items-center gap-2"
                 >
-                  Status Iuran Bulan Ini
+                  <i class="fa-solid fa-qrcode"></i> Info Transfer via QRIS
                 </h4>
                 <div
-                  class="h-64 w-full relative flex items-center justify-center"
+                  class="flex-1 w-full relative flex flex-col items-center justify-center bg-white/5 rounded-lg border border-white/10 p-2 min-h-[12rem]"
                 >
-                  <canvas id="iuranChart"></canvas>
+                  <img id="qris-image-preview" src="" alt="QRIS" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-white/10 backdrop-blur-sm cursor-zoom-in z-0" onclick="if(this.src && this.src !== window.location.href) window.UI.viewImage(this.src, 'QRIS Transfer', 'Pindai kode QRIS ini untuk transfer dana')" />
+                  
+                  <div id="qris-empty-state" class="w-full h-full min-h-[12rem] flex flex-col items-center justify-center text-gray-500 z-0">
+                    <i class="fa-solid fa-qrcode text-5xl mb-3 opacity-30"></i>
+                    <p class="text-sm font-medium">QRIS Belum Tersedia</p>
+                  </div>
+
+                  <button class="admin-only absolute top-2 right-2 bg-mystic-900/80 text-gold hover:text-white border border-gold/30 hover:border-white p-2 rounded-lg text-xs shadow-lg backdrop-blur-sm transition-all z-10" onclick="document.getElementById('qris-upload').click()">
+                    <i class="fa-solid fa-camera mr-1"></i> Ubah QRIS
+                  </button>
+
+                  <input type="file" id="qris-upload" class="hidden" accept="image/*" onchange="
+                    const file = this.files[0];
+                    if(file) {
+                      const reader = new FileReader();
+                      reader.onload = function(e) {
+                        const img = document.getElementById('qris-image-preview');
+                        const empty = document.getElementById('qris-empty-state');
+                        img.src = e.target.result;
+                        img.classList.remove('hidden');
+                        if(empty) empty.classList.add('hidden');
+                        localStorage.setItem('qrisImage', e.target.result);
+                      }
+                      reader.readAsDataURL(file);
+                    }
+                  ">
+                  <script>
+                    setTimeout(() => {
+                      const savedQRIS = localStorage.getItem('qrisImage');
+                      if (savedQRIS) {
+                        const img = document.getElementById('qris-image-preview');
+                        const empty = document.getElementById('qris-empty-state');
+                        if (img) {
+                          img.src = savedQRIS;
+                          img.classList.remove('hidden');
+                          if(empty) empty.classList.add('hidden');
+                        }
+                      }
+                    }, 100);
+                  </script>
+                </div>
+                
+                <div class="mt-4">
+                  <a href="https://wa.me/6285150941574?text=Halo%20Admin%2C%20saya%20ingin%20konfirmasi%20bahwa%20saya%20sudah%20melakukan%20transfer%20dana%20via%20QRIS.%20Berikut%20saya%20lampirkan%20bukti%20transfernya.%20Mohon%20untuk%20dicek.%20Terima%20kasih." target="_blank" class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1DA851] text-white font-semibold py-2.5 rounded-lg transition-all shadow-[0_0_10px_rgba(37,211,102,0.3)] hover:shadow-[0_0_15px_rgba(37,211,102,0.5)]">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    Konfirmasi Transfer ke Admin
+                  </a>
                 </div>
               </div>
             </div>
@@ -3368,39 +3414,42 @@
           let belum = tA - pM;
           if (belum < 0) belum = 0;
 
-          window.App.charts.iuran = new Chart(
-            document.getElementById("iuranChart").getContext("2d"),
-            {
-              type: "doughnut",
-              data: {
-                labels: ["Lunas", "Belum / Belum Tercatat"],
-                datasets: [
-                  {
-                    data: [pM, belum],
-                    backgroundColor: ["#06b6d4", "rgba(15, 23, 42, 0.5)"],
-                    borderColor: ["#020617", "#020617"],
-                    borderWidth: 3,
-                    hoverOffset: 4
+          const iuranCanvas = document.getElementById("iuranChart");
+          if (iuranCanvas) {
+            window.App.charts.iuran = new Chart(
+              iuranCanvas.getContext("2d"),
+              {
+                type: "doughnut",
+                data: {
+                  labels: ["Lunas", "Belum / Belum Tercatat"],
+                  datasets: [
+                    {
+                      data: [pM, belum],
+                      backgroundColor: ["#06b6d4", "rgba(15, 23, 42, 0.5)"],
+                      borderColor: ["#020617", "#020617"],
+                      borderWidth: 3,
+                      hoverOffset: 4
+                    },
+                  ],
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  cutout: "75%",
+                  plugins: { 
+                    legend: { position: "bottom" },
+                    tooltip: {
+                      backgroundColor: "rgba(15, 23, 42, 0.9)",
+                      titleColor: "#06b6d4",
+                      bodyColor: "#f8fafc",
+                      borderColor: "rgba(6, 182, 212, 0.3)",
+                      borderWidth: 1,
+                    }
                   },
-                ],
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: "75%",
-                plugins: { 
-                  legend: { position: "bottom" },
-                  tooltip: {
-                    backgroundColor: "rgba(15, 23, 42, 0.9)",
-                    titleColor: "#06b6d4",
-                    bodyColor: "#f8fafc",
-                    borderColor: "rgba(6, 182, 212, 0.3)",
-                    borderWidth: 1,
-                  }
                 },
               },
-            },
-          );
+            );
+          }
         },
       };
 
