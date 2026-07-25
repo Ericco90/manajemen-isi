@@ -965,7 +965,7 @@
               >
                 <i class="fa-solid fa-bolt"></i> Riwayat Aktivitas Terbaru
               </h4>
-              <div class="overflow-x-auto">
+              <div class="overflow-x-auto max-h-[400px] overflow-y-auto custom-scrollbar">
                 <table
                   class="w-full text-left border-collapse mystic-table text-sm"
                 >
@@ -975,6 +975,7 @@
                       <th class="p-3">Keterangan</th>
                       <th class="p-3">Jenis</th>
                       <th class="p-3 text-right">Nominal</th>
+                      <th class="p-3 text-center admin-only">Aksi</th>
                     </tr>
                   </thead>
                   <tbody id="table-recent"></tbody>
@@ -2847,6 +2848,8 @@
           let recent = [];
           window.App.data.iuran.forEach((i) =>
             recent.push({
+              table: 'iuran',
+              id: i.id,
               tgl: i.tgl,
               desc: `Iuran ${i.nama}`,
               type: "in",
@@ -2855,6 +2858,8 @@
           );
           window.App.data.pemasukan.forEach((p) =>
             recent.push({
+              table: 'pemasukan',
+              id: p.id,
               tgl: p.tgl,
               desc: p.sumber,
               type: "in",
@@ -2863,6 +2868,8 @@
           );
           window.App.data.pengeluaran.forEach((p) =>
             recent.push({
+              table: 'pengeluaran',
+              id: p.id,
               tgl: p.tgl,
               desc: p.keperluan,
               type: "out",
@@ -2871,7 +2878,7 @@
           );
 
           recent.sort((a, b) => new Date(b.tgl) - new Date(a.tgl));
-          recent = recent.slice(0, 5);
+          // recent = recent.slice(0, 5); // Tampilkan semua riwayat
 
           const tbody = document.getElementById("table-recent");
           tbody.innerHTML = "";
@@ -2885,6 +2892,7 @@
                             <td class="p-3 text-gray-400">${window.Utils.formatDate(r.tgl)}</td><td class="p-3">${r.desc}</td>
                             <td class="p-3"><span class="px-2 py-1 text-[10px] rounded bg-${isOut ? "red" : "pupus"}-900/50 text-${isOut ? "red" : "pupus"} uppercase">${isOut ? "Keluar" : "Masuk"}</span></td>
                             <td class="p-3 text-right text-${isOut ? "red-400" : "pupus"} font-semibold">${isOut ? "-" : "+"}${window.Utils.formatRupiah(r.amount)}</td>
+                            <td class="p-3 text-center admin-only"><button onclick="window.App.crud.deleteData('${r.table}', '${r.id}')" class="w-7 h-7 rounded bg-red-900/50 text-red-400 hover:text-white transition" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button></td>
                         </tr>`;
             });
           }
