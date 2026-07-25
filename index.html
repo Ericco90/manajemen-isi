@@ -907,79 +907,13 @@
                 <div
                   class="flex-1 w-full relative flex flex-col items-center justify-center bg-white/5 rounded-lg border border-white/10 p-2 min-h-[12rem]"
                 >
-                  <img id="qris-image-preview" src="" alt="QRIS" class="hidden absolute inset-0 w-full h-full object-contain p-2 bg-white/10 backdrop-blur-sm cursor-zoom-in z-0" onclick="if(this.src && this.src !== window.location.href) window.UI.viewImage(this.src, 'QRIS Transfer', 'Pindai kode QRIS ini untuk transfer dana')" />
+                  <img src="image/qris.jpg" alt="QRIS" class="absolute inset-0 w-full h-full object-contain p-2 bg-white/10 backdrop-blur-sm cursor-zoom-in z-0" onclick="window.UI.viewImage(this.src, 'QRIS Transfer', 'Pindai kode QRIS ini untuk transfer dana')" onerror="this.classList.add('hidden'); document.getElementById('qris-empty-state').classList.remove('hidden');" />
                   
-                  <div id="qris-empty-state" class="w-full h-full min-h-[12rem] flex flex-col items-center justify-center text-gray-500 z-0">
+                  <div id="qris-empty-state" class="w-full h-full min-h-[12rem] flex flex-col items-center justify-center text-gray-500 z-0 hidden">
                     <i class="fa-solid fa-qrcode text-5xl mb-3 opacity-30"></i>
-                    <p class="text-sm font-medium">QRIS Belum Tersedia</p>
+                    <p class="text-sm font-medium text-center">QRIS Belum Tersedia</p>
+                    <p class="text-[10px] mt-1 text-center">Simpan gambar QRIS sebagai <b>image/qris.jpg</b><br>di dalam folder project</p>
                   </div>
-
-                  <button class="admin-only absolute top-2 right-2 bg-mystic-900/80 text-gold hover:text-white border border-gold/30 hover:border-white p-2 rounded-lg text-xs shadow-lg backdrop-blur-sm transition-all z-10" onclick="document.getElementById('qris-upload').click()">
-                    <i class="fa-solid fa-camera mr-1"></i> Ubah QRIS
-                  </button>
-
-                  <input type="file" id="qris-upload" class="hidden" accept="image/*" onchange="
-                    const file = this.files[0];
-                    if(file) {
-                      const reader = new FileReader();
-                      reader.onload = function(e) {
-                        const img = new Image();
-                        img.onload = function() {
-                          const canvas = document.createElement('canvas');
-                          let w = img.width, h = img.height;
-                          if (w > 500 || h > 500) {
-                            if (w > h) { h = Math.round((500 / w) * h); w = 500; }
-                            else { w = Math.round((500 / h) * w); h = 500; }
-                          }
-                          canvas.width = w; canvas.height = h;
-                          const ctx = canvas.getContext('2d');
-                          // Fill white background for transparency (since we use JPEG)
-                          ctx.fillStyle = '#ffffff';
-                          ctx.fillRect(0, 0, w, h);
-                          ctx.drawImage(img, 0, 0, w, h);
-                          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                          
-                          const previewImg = document.getElementById('qris-image-preview');
-                          const empty = document.getElementById('qris-empty-state');
-                          previewImg.src = dataUrl;
-                          previewImg.classList.remove('hidden');
-                          if(empty) empty.classList.add('hidden');
-                          
-                          localStorage.setItem('qrisImage', dataUrl);
-                          window.DB.saveItem('informasi', {
-                            id: 'qris_img',
-                            tanggal: new Date().toISOString().split('T')[0],
-                            judul: 'QRIS_YAYASAN',
-                            keterangan: 'QRIS Data',
-                            gambar: dataUrl
-                          }).then(() => {
-                            if(window.App.data && window.App.data.informasi) {
-                               const idx = window.App.data.informasi.findIndex(x => x.id === 'qris_img');
-                               if(idx > -1) window.App.data.informasi[idx].gambar = dataUrl;
-                               else window.App.data.informasi.push({id: 'qris_img', tanggal: new Date().toISOString().split('T')[0], judul: 'QRIS_YAYASAN', gambar: dataUrl});
-                            }
-                            window.UI.toast.success("QRIS tersimpan permanen");
-                          });
-                        };
-                        img.src = e.target.result;
-                      }
-                      reader.readAsDataURL(file);
-                    }
-                  ">
-                  <script>
-                    setTimeout(() => {
-                      const savedQRIS = localStorage.getItem('qrisImage');
-                      if (savedQRIS) {
-                        const img = document.getElementById('qris-image-preview');
-                        const empty = document.getElementById('qris-empty-state');
-                        if (img) {
-                          img.src = savedQRIS;
-                          img.classList.remove('hidden');
-                          if(empty) empty.classList.add('hidden');
-                        }
-                      }
-                    }, 100);
-                  </script>
                 </div>
                 
                 <div class="mt-4">
@@ -2931,18 +2865,6 @@
           }
           window.UI.initCharts();
           window.UI.renderInformasi();
-          
-          const qrisData = (window.App.data.informasi || []).find(i => i.id === 'qris_img');
-          if (qrisData && qrisData.gambar) {
-            const previewImg = document.getElementById('qris-image-preview');
-            const empty = document.getElementById('qris-empty-state');
-            if (previewImg) {
-              previewImg.src = qrisData.gambar;
-              previewImg.classList.remove('hidden');
-              if (empty) empty.classList.add('hidden');
-              localStorage.setItem('qrisImage', qrisData.gambar);
-            }
-          }
         },
 
         renderStruktur: () => {
@@ -3198,7 +3120,7 @@
           );
           
           // Filter out empty rows from Google Sheets that might just have IDs but no real data
-          data = data.filter(inf => (inf.judul || inf.gambar) && inf.id !== 'qris_img');
+          data = data.filter(inf => inf.judul || inf.gambar);
 
           if (data.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${window.App.isAdmin ? 4 : 3}" class="p-8 text-center text-gray-500">Belum ada informasi.</td></tr>`;
