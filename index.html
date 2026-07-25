@@ -2892,7 +2892,7 @@
                             <td class="p-3 text-gray-400">${window.Utils.formatDate(r.tgl)}</td><td class="p-3">${r.desc}</td>
                             <td class="p-3"><span class="px-2 py-1 text-[10px] rounded bg-${isOut ? "red" : "pupus"}-900/50 text-${isOut ? "red" : "pupus"} uppercase">${isOut ? "Keluar" : "Masuk"}</span></td>
                             <td class="p-3 text-right text-${isOut ? "red-400" : "pupus"} font-semibold">${isOut ? "-" : "+"}${window.Utils.formatRupiah(r.amount)}</td>
-                            <td class="p-3 text-center admin-only"><button onclick="window.App.crud.deleteData('${r.table}', '${r.id}')" class="w-7 h-7 rounded bg-red-900/50 text-red-400 hover:text-white transition" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button></td>
+                            <td class="p-3 text-center admin-only ${window.App.isAdmin ? '' : 'hidden'}"><button onclick="window.App.crud.deleteData('${r.table}', '${r.id}')" class="w-7 h-7 rounded bg-red-900/50 text-red-400 hover:text-white transition" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button></td>
                         </tr>`;
             });
           }
