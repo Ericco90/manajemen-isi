@@ -454,6 +454,32 @@
         .ornament-border, #global-loader, #toast-container {
           display: none !important;
         }
+
+        /* ID Card Print Specifics */
+        body.printing-idcard {
+          background: white !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        body.printing-idcard * {
+          visibility: hidden;
+        }
+        body.printing-idcard #the-id-card, 
+        body.printing-idcard #the-id-card * {
+          visibility: visible;
+        }
+        body.printing-idcard #the-id-card {
+          position: absolute;
+          left: 0;
+          top: 0;
+          margin: 0;
+          transform: scale(0.26) !important;
+          transform-origin: top left !important;
+          page-break-after: always;
+          box-shadow: none !important;
+        }
       }
 
       /* AI Cyberpunk Overrides */
@@ -645,6 +671,16 @@
               >
                 <i class="fa-solid fa-users w-5 text-center"></i>
                 <span class="font-medium text-sm">Daftar Anggota</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                data-target="idcard"
+                class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-gold transition-colors"
+              >
+                <i class="fa-solid fa-id-card w-5 text-center"></i>
+                <span class="font-medium text-sm">Kartu Anggota</span>
               </a>
             </li>
             <li
@@ -1027,6 +1063,121 @@
               >
                 <i class="fa-solid fa-ghost text-4xl mb-3 opacity-20"></i>
                 <p>Belum ada daftar anggota.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ID Card View -->
+          <div id="view-idcard" class="view-section hidden animate-fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between gap-4 items-center glass-card p-4 rounded-xl">
+              <h3 class="font-cinzel text-gold text-lg">
+                Cetak Kartu Tanda Anggota (KTA)
+              </h3>
+              <div class="relative w-full sm:w-64">
+                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
+                <input
+                  type="text"
+                  id="search-idcard-member"
+                  class="mystic-input w-full pl-10 pr-4 py-2 rounded-lg text-sm"
+                  placeholder="Cari nama/ID..."
+                  onkeyup="window.UI.renderIDCardList()"
+                />
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Left side: Member list -->
+              <div class="glass-card rounded-xl overflow-hidden md:col-span-1 max-h-[600px] flex flex-col">
+                <div class="p-4 border-b border-white/10 bg-white/5">
+                  <h4 class="font-semibold text-pupus text-sm">Pilih Anggota</h4>
+                </div>
+                <div id="idcard-member-list" class="overflow-y-auto flex-1 custom-scrollbar p-2 space-y-2">
+                  <!-- List of members goes here -->
+                </div>
+              </div>
+              
+              <!-- Right side: ID Card Preview -->
+              <div class="glass-card p-6 rounded-xl md:col-span-2 flex flex-col items-center justify-center min-h-[400px]">
+                <div id="idcard-preview-container" class="hidden flex-col items-center w-full">
+                  <!-- The Card -->
+                  <div id="the-id-card" class="relative bg-white shadow-2xl overflow-hidden rounded-md" style="width: 1280px; height: 782px; transform: scale(0.4); transform-origin: top center; margin-bottom: -460px;">
+                    <!-- Background Template -->
+                    <img src="BLANGKO KTA.png" class="absolute inset-0 w-full h-full object-cover z-0" alt="Template KTA" onerror="this.src='https://placehold.co/1280x782/1a1a1a/FFF?text=BLANGKO+KTA.png+tidak+ditemukan'">
+                    
+                    <!-- Content Overlay -->
+                    <div class="absolute inset-0 z-10 flex text-black font-sans">
+                       <!-- Photo Box (Left) -->
+                       <div class="absolute" style="top: 240px; left: 45px; width: 310px; height: 400px;">
+                         <img id="kta-foto" src="" class="w-full h-full object-cover rounded-sm border-4 border-white shadow-md" alt="Foto Anggota">
+                       </div>
+                       
+                       <!-- ID Number Below Photo -->
+                       <div class="absolute font-bold text-center" style="bottom: 45px; left: 45px; width: 310px; font-size: 30px;">
+                         <span id="kta-id" class="tracking-widest"></span>
+                       </div>
+
+                       <!-- Data Table (Center/Right) -->
+                       <div class="absolute" style="top: 240px; left: 390px; right: 45px;">
+                         <table class="w-full text-left font-bold" style="font-size: 30px; line-height: 1.5;">
+                           <tr>
+                             <td style="width: 170px; padding-bottom: 12px;">NAMA</td>
+                             <td style="width: 20px; padding-bottom: 12px;">:</td>
+                             <td style="padding-bottom: 12px;" id="kta-nama"></td>
+                           </tr>
+                           <tr>
+                             <td style="padding-bottom: 12px;">GELAR</td>
+                             <td style="padding-bottom: 12px;">:</td>
+                             <td style="padding-bottom: 12px;" id="kta-gelar">-</td>
+                           </tr>
+                           <tr>
+                             <td style="padding-bottom: 12px;">KEAHLIAN</td>
+                             <td style="padding-bottom: 12px;">:</td>
+                             <td style="padding-bottom: 12px;" id="kta-keahlian">-</td>
+                           </tr>
+                           <tr>
+                             <td style="padding-bottom: 12px;">NIK</td>
+                             <td style="padding-bottom: 12px;">:</td>
+                             <td style="padding-bottom: 12px;" id="kta-nik">-</td>
+                           </tr>
+                           <tr>
+                             <td style="padding-bottom: 12px;">JABATAN</td>
+                             <td style="padding-bottom: 12px;">:</td>
+                             <td style="padding-bottom: 12px;" id="kta-jabatan"></td>
+                           </tr>
+                           <tr>
+                             <td style="vertical-align: top;">ALAMAT</td>
+                             <td style="vertical-align: top;">:</td>
+                             <td id="kta-alamat" class="whitespace-pre-line" style="font-size: 24px; line-height: 1.4;"></td>
+                           </tr>
+                         </table>
+                       </div>
+                       
+                       <!-- QR Code -->
+                       <div class="absolute bg-white rounded-md flex items-center justify-center" style="top: 240px; right: 55px; width: 190px; height: 190px;">
+                         <img id="kta-qr" src="" class="w-[170px] h-[170px] object-contain" alt="QR Code">
+                       </div>
+
+                       <!-- Valid Until -->
+                       <div class="absolute font-bold" style="bottom: 50px; left: 390px; font-size: 24px;">
+                         <span id="kta-berlaku" style="background-color: #fce703; padding: 4px 8px; margin-left: -8px;"></span>
+                       </div>
+
+                       <!-- Tanggal Cetak (Samping Brebes) -->
+                       <div class="absolute font-bold text-left" style="bottom: 205px; right: 55px; width: 170px; font-size: 22px;" id="kta-tanggal-cetak"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-8 flex gap-4 w-full justify-center">
+                    <button onclick="window.UI.printIDCard()" class="bg-gold text-mystic-900 font-bold px-6 py-3 rounded-lg shadow-[0_0_15px_rgba(212,175,55,0.4)] hover:bg-gold-light transition">
+                      <i class="fa-solid fa-download mr-2"></i> Simpan Gambar (PNG)
+                    </button>
+                  </div>
+                </div>
+                
+                <div id="idcard-empty-state" class="flex flex-col items-center justify-center text-gray-500 w-full h-full min-h-[300px]">
+                  <i class="fa-solid fa-id-card text-6xl mb-4 opacity-20"></i>
+                  <p>Pilih anggota dari daftar di sebelah kiri untuk melihat KTA.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -1469,6 +1620,20 @@
                 class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm"
                 rows="2"
               ></textarea>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="text-xs text-gray-400">Gelar</label>
+                <input type="text" id="anggota-gelar" class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm" placeholder="Kosongkan jika tidak ada" />
+              </div>
+              <div>
+                <label class="text-xs text-gray-400">Keahlian</label>
+                <input type="text" id="anggota-keahlian" class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm" placeholder="Kosongkan jika tidak ada" />
+              </div>
+              <div>
+                <label class="text-xs text-gray-400">NIK</label>
+                <input type="text" id="anggota-nik" class="mystic-input w-full px-3 py-2 rounded mt-1 text-sm" placeholder="Kosongkan jika tidak ada" />
+              </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
@@ -2288,6 +2453,7 @@
             pemasukan: "Pemasukan Lain",
             pengeluaran: "Catatan Pengeluaran",
             laporan: "Kitab Laporan",
+            idcard: "Cetak Kartu Anggota",
           };
           document.getElementById("page-title").textContent = titles[viewId];
 
@@ -2301,6 +2467,7 @@
           if (viewId === "pemasukan") window.UI.renderPemasukan();
           if (viewId === "pengeluaran") window.UI.renderPengeluaran();
           if (viewId === "laporan") window.UI.renderLaporan();
+          if (viewId === "idcard") window.UI.renderIDCardList();
 
           if (window.innerWidth < 768)
             document
@@ -2541,6 +2708,9 @@
               nama: nama,
               hp: document.getElementById("anggota-hp").value,
               alamat: document.getElementById("anggota-alamat").value,
+              gelar: document.getElementById("anggota-gelar").value,
+              keahlian: document.getElementById("anggota-keahlian").value,
+              nik: document.getElementById("anggota-nik").value,
               jabatan: document.getElementById("anggota-jabatan").value,
               status: document.getElementById("anggota-status").value,
               foto:
@@ -2982,6 +3152,97 @@
                         </tr>`;
             });
           }
+        },
+
+        renderIDCardList: () => {
+          const searchInput = document.getElementById("search-idcard-member");
+          if (!searchInput) return;
+          const search = searchInput.value.toLowerCase();
+          const filtered = window.App.data.anggota.filter(a => a.status === "Aktif" && (a.nama.toLowerCase().includes(search) || a.id.toLowerCase().includes(search)));
+          const listContainer = document.getElementById("idcard-member-list");
+          if (!listContainer) return;
+          listContainer.innerHTML = "";
+          if (filtered.length === 0) {
+            listContainer.innerHTML = '<div class="text-center text-gray-500 py-4 text-sm">Anggota tidak ditemukan.</div>';
+            return;
+          }
+          filtered.forEach(a => {
+             const imgUrl = a.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.nama)}&background=11261b&color=B2D2A4`;
+             const item = document.createElement("div");
+             item.className = "flex items-center gap-3 p-3 rounded bg-mystic-900/50 border border-white/5 hover:border-gold hover:bg-white/10 cursor-pointer transition";
+             item.onclick = () => window.UI.previewIDCard(a);
+             item.innerHTML = `
+                <img src="${imgUrl}" onerror="this.src='https://ui-avatars.com/api/?name=${a.nama.replace(/\s+/g, '+')}&background=11261b&color=D4AF37'" class="w-10 h-10 rounded-full object-cover border border-gold/50 flex-shrink-0" />
+                <div class="overflow-hidden">
+                  <h4 class="font-bold text-pupus text-sm truncate">${a.nama}</h4>
+                  <p class="text-[10px] text-gray-400 truncate">${a.id} &bull; ${a.jabatan}</p>
+                </div>
+             `;
+             listContainer.appendChild(item);
+          });
+        },
+
+        previewIDCard: (member) => {
+           document.getElementById("idcard-empty-state").classList.add("hidden");
+           document.getElementById("idcard-preview-container").classList.remove("hidden");
+           document.getElementById("idcard-preview-container").classList.add("flex");
+           
+           const imgUrl = member.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.nama)}&background=11261b&color=B2D2A4`;
+           const fotoEl = document.getElementById("kta-foto");
+           fotoEl.crossOrigin = "anonymous";
+           fotoEl.src = imgUrl;
+           
+           document.getElementById("kta-nama").textContent = member.nama.toUpperCase();
+           document.getElementById("kta-id").textContent = member.id.replace(/-/g, '');
+           document.getElementById("kta-gelar").textContent = (member.gelar || "-").toUpperCase();
+           document.getElementById("kta-keahlian").textContent = (member.keahlian || "-").toUpperCase();
+           document.getElementById("kta-nik").textContent = (member.nik || "-").toUpperCase();
+           document.getElementById("kta-jabatan").textContent = member.jabatan.toUpperCase();
+           document.getElementById("kta-alamat").textContent = (member.alamat || "-").toUpperCase();
+           
+           // Shortened QR Data for better scan reliability
+           const qrText = `NAMA: ${member.nama.toUpperCase()}\nID: ${member.id.toUpperCase()}\nJABATAN: ${member.jabatan.toUpperCase()}`;
+           const qrEl = document.getElementById("kta-qr");
+           qrEl.crossOrigin = "anonymous";
+           qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrText)}`;
+           
+           const now = new Date();
+           const futureDate = new Date(now);
+           futureDate.setFullYear(futureDate.getFullYear() + 5);
+           document.getElementById("kta-berlaku").textContent = `BERLAKU SAMPAI : ${window.Utils.formatDate(futureDate.toISOString())}`.toUpperCase();
+           document.getElementById("kta-tanggal-cetak").textContent = `, ${window.Utils.formatDate(now.toISOString())}`.toUpperCase();
+        },
+
+        printIDCard: async () => {
+           const btn = document.querySelector('button[onclick="window.UI.printIDCard()"]');
+           if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memproses...`;
+           
+           const card = document.getElementById("the-id-card");
+           const originalTransform = card.style.transform;
+           card.style.transform = "scale(1)"; // Reset scale for full resolution export
+           
+           try {
+             await new Promise(r => setTimeout(r, 100)); // UI update tick
+             const canvas = await html2canvas(card, {
+               scale: 1,
+               useCORS: true,
+               backgroundColor: null,
+             });
+             
+             card.style.transform = originalTransform;
+             const link = document.createElement("a");
+             link.download = `KTA_${document.getElementById("kta-nama").textContent.replace(/\s+/g, '_')}.png`;
+             link.href = canvas.toDataURL("image/png");
+             link.click();
+             
+             window.UI.toast.success("Kartu berhasil disimpan sebagai gambar.");
+           } catch (error) {
+             card.style.transform = originalTransform;
+             console.error("Canvas Error:", error);
+             window.UI.toast.error("Gagal menyimpan gambar.");
+           } finally {
+             if (btn) btn.innerHTML = `<i class="fa-solid fa-download mr-2"></i> Simpan Gambar (PNG)`;
+           }
         },
 
         renderIuran: () => {
@@ -3440,5 +3701,6 @@
         });
       }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   </body>
 </html>
