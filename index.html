@@ -1112,98 +1112,14 @@
               </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- Left side: Member list -->
-              <div class="glass-card rounded-xl overflow-hidden md:col-span-1 max-h-[600px] flex flex-col">
+            <div class="grid grid-cols-1 gap-6">
+              <!-- Member list (Full Width) -->
+              <div class="glass-card rounded-xl overflow-hidden max-h-[600px] flex flex-col">
                 <div class="p-4 border-b border-white/10 bg-white/5">
                   <h4 class="font-semibold text-pupus text-sm">Pilih Anggota</h4>
                 </div>
                 <div id="idcard-member-list" class="overflow-y-auto flex-1 custom-scrollbar p-2 space-y-2">
                   <!-- List of members goes here -->
-                </div>
-              </div>
-              
-              <!-- Right side: ID Card Preview -->
-              <div class="glass-card p-6 rounded-xl md:col-span-2 flex flex-col items-center justify-center min-h-[400px]">
-                <div id="idcard-preview-container" class="hidden flex-col items-center w-full">
-                  <!-- The Card -->
-                  <div id="the-id-card" class="relative bg-white shadow-2xl overflow-hidden rounded-md responsive-idcard">
-                    <!-- Background Template -->
-                    <img src="BLANGKO KTA.png" class="absolute inset-0 w-full h-full object-cover z-0" alt="Template KTA" onerror="this.src='https://placehold.co/1280x782/1a1a1a/FFF?text=BLANGKO+KTA.png+tidak+ditemukan'">
-                    
-                    <!-- Content Overlay -->
-                    <div class="absolute inset-0 z-10 flex text-black font-sans">
-                       <!-- Photo Box (Left) -->
-                       <div class="absolute" style="top: 240px; left: 45px; width: 310px; height: 400px;">
-                         <img id="kta-foto" src="" class="w-full h-full object-cover rounded-sm border-4 border-white shadow-md" alt="Foto Anggota">
-                       </div>
-                       
-                       <!-- ID Number Below Photo -->
-                       <div class="absolute font-bold text-center" style="bottom: 45px; left: 45px; width: 310px; font-size: 30px;">
-                         <span id="kta-id" class="tracking-widest"></span>
-                       </div>
-
-                       <!-- Data Table (Center/Right) -->
-                       <div class="absolute" style="top: 240px; left: 390px; right: 45px;">
-                         <table class="w-full text-left font-bold" style="font-size: 30px; line-height: 1.5;">
-                           <tr>
-                             <td style="width: 170px; padding-bottom: 12px;">NAMA</td>
-                             <td style="width: 20px; padding-bottom: 12px;">:</td>
-                             <td style="padding-bottom: 12px;" id="kta-nama"></td>
-                           </tr>
-                           <tr>
-                             <td style="padding-bottom: 12px;">GELAR</td>
-                             <td style="padding-bottom: 12px;">:</td>
-                             <td style="padding-bottom: 12px;" id="kta-gelar">-</td>
-                           </tr>
-                           <tr>
-                             <td style="padding-bottom: 12px;">KEAHLIAN</td>
-                             <td style="padding-bottom: 12px;">:</td>
-                             <td style="padding-bottom: 12px;" id="kta-keahlian">-</td>
-                           </tr>
-                           <tr>
-                             <td style="padding-bottom: 12px;">NIK</td>
-                             <td style="padding-bottom: 12px;">:</td>
-                             <td style="padding-bottom: 12px;" id="kta-nik">-</td>
-                           </tr>
-                           <tr>
-                             <td style="padding-bottom: 12px;">JABATAN</td>
-                             <td style="padding-bottom: 12px;">:</td>
-                             <td style="padding-bottom: 12px;" id="kta-jabatan"></td>
-                           </tr>
-                           <tr>
-                             <td style="vertical-align: top;">ALAMAT</td>
-                             <td style="vertical-align: top;">:</td>
-                             <td id="kta-alamat" class="whitespace-pre-line" style="font-size: 24px; line-height: 1.4;"></td>
-                           </tr>
-                         </table>
-                       </div>
-                       
-                       <!-- QR Code -->
-                       <div class="absolute bg-white rounded-md flex items-center justify-center" style="top: 240px; right: 55px; width: 190px; height: 190px;">
-                         <img id="kta-qr" src="" class="w-[170px] h-[170px] object-contain" alt="QR Code">
-                       </div>
-
-                       <!-- Valid Until -->
-                       <div class="absolute font-bold" style="bottom: 50px; left: 390px; font-size: 24px;">
-                         <span id="kta-berlaku" style="background-color: #fce703; padding: 4px 8px; margin-left: -8px;"></span>
-                       </div>
-
-                       <!-- Tanggal Cetak (Samping Brebes) -->
-                       <div class="absolute font-bold text-left" style="bottom: 205px; right: 55px; width: 170px; font-size: 22px;" id="kta-tanggal-cetak"></div>
-                    </div>
-                  </div>
-                  
-                  <div class="mt-8 flex gap-4 w-full justify-center">
-                    <button onclick="window.UI.printIDCard()" class="bg-gold text-mystic-900 font-bold px-6 py-3 rounded-lg shadow-[0_0_15px_rgba(212,175,55,0.4)] hover:bg-gold-light transition">
-                      <i class="fa-solid fa-download mr-2"></i> Simpan Gambar (PNG)
-                    </button>
-                  </div>
-                </div>
-                
-                <div id="idcard-empty-state" class="flex flex-col items-center justify-center text-gray-500 w-full h-full min-h-[300px]">
-                  <i class="fa-solid fa-id-card text-6xl mb-4 opacity-20"></i>
-                  <p>Pilih anggota dari daftar di sebelah kiri untuk melihat KTA.</p>
                 </div>
               </div>
             </div>
@@ -1517,6 +1433,95 @@
 
     <!-- MODALS -->
     <div id="modal-container">
+      <!-- Modal ID Card Preview -->
+      <div id="modal-idcard-preview" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-4xl rounded-xl p-6 relative animate-slide-up flex flex-col items-center overflow-y-auto max-h-[90vh] custom-scrollbar">
+          <button onclick="window.UI.modals.close('modal-idcard-preview')" class="absolute right-4 top-4 text-gray-400 hover:text-red-400 transition-colors z-50">
+            <i class="fa-solid fa-times text-2xl"></i>
+          </button>
+          <h3 class="text-xl font-cinzel text-gold mb-6">Preview Kartu Anggota</h3>
+          
+          <div id="idcard-preview-container" class="flex flex-col items-center w-full">
+            <!-- The Card -->
+            <div id="the-id-card" class="relative bg-white shadow-2xl overflow-hidden rounded-md responsive-idcard">
+              <!-- Background Template -->
+              <img src="BLANGKO KTA.png" class="absolute inset-0 w-full h-full object-cover z-0" alt="Template KTA" onerror="this.src='https://placehold.co/1280x782/1a1a1a/FFF?text=BLANGKO+KTA.png+tidak+ditemukan'">
+              
+              <!-- Content Overlay -->
+              <div class="absolute inset-0 z-10 flex text-black font-sans">
+                 <!-- Photo Box (Left) -->
+                 <div class="absolute" style="top: 240px; left: 45px; width: 310px; height: 400px;">
+                   <img id="kta-foto" src="" class="w-full h-full object-cover rounded-sm border-4 border-white shadow-md" alt="Foto Anggota">
+                 </div>
+                 
+                 <!-- ID Number Below Photo -->
+                 <div class="absolute font-bold text-center" style="bottom: 45px; left: 45px; width: 310px; font-size: 30px;">
+                   <span id="kta-id" class="tracking-widest"></span>
+                 </div>
+
+                 <!-- Data Table (Center/Right) -->
+                 <div class="absolute" style="top: 240px; left: 390px; right: 45px;">
+                   <table class="w-full text-left font-bold" style="font-size: 30px; line-height: 1.5;">
+                     <tr>
+                       <td style="width: 170px; padding-bottom: 12px;">NAMA</td>
+                       <td style="width: 20px; padding-bottom: 12px;">:</td>
+                       <td style="padding-bottom: 12px;" id="kta-nama"></td>
+                     </tr>
+                     <tr>
+                       <td style="padding-bottom: 12px;">GELAR</td>
+                       <td style="padding-bottom: 12px;">:</td>
+                       <td style="padding-bottom: 12px;" id="kta-gelar"></td>
+                     </tr>
+                     <tr>
+                       <td style="padding-bottom: 12px;">KEAHLIAN</td>
+                       <td style="padding-bottom: 12px;">:</td>
+                       <td style="padding-bottom: 12px;" id="kta-keahlian"></td>
+                     </tr>
+                     <tr>
+                       <td style="padding-bottom: 12px;">NIK</td>
+                       <td style="padding-bottom: 12px;">:</td>
+                       <td style="padding-bottom: 12px;" id="kta-nik"></td>
+                     </tr>
+                     <tr>
+                       <td style="padding-bottom: 12px;">JABATAN</td>
+                       <td style="padding-bottom: 12px;">:</td>
+                       <td style="padding-bottom: 12px;" id="kta-jabatan"></td>
+                     </tr>
+                     <tr>
+                       <td style="padding-bottom: 12px; vertical-align: top;">ALAMAT</td>
+                       <td style="padding-bottom: 12px; vertical-align: top;">:</td>
+                       <td style="padding-bottom: 12px; white-space: normal;" id="kta-alamat"></td>
+                     </tr>
+                   </table>
+                 </div>
+                 
+                 <!-- QR Code -->
+                 <div class="absolute bg-white rounded-md flex items-center justify-center" style="top: 240px; right: 55px; width: 190px; height: 190px;">
+                   <!-- Yellow Cover -->
+                   <div class="absolute inset-0 bg-[#EDDE1A] z-0 rounded-md shadow-md"></div>
+                   <!-- Actual QR -->
+                   <img id="kta-qr" src="" class="w-[170px] h-[170px] object-contain relative z-10" alt="QR Code">
+                 </div>
+                 
+                 <!-- Valid Until -->
+                 <div class="absolute font-bold" style="bottom: 50px; left: 390px; font-size: 24px;">
+                   <span id="kta-berlaku" style="background-color: #fce703; padding: 4px 8px; margin-left: -8px;"></span>
+                 </div>
+
+                 <!-- Tanggal Cetak (Samping Brebes) -->
+                 <div class="absolute font-bold text-left" style="bottom: 205px; right: 55px; width: 170px; font-size: 22px;" id="kta-tanggal-cetak"></div>
+              </div>
+            </div>
+            
+            <div class="mt-8 flex gap-4 w-full justify-center">
+              <button onclick="window.UI.printIDCard()" class="bg-gold text-mystic-900 font-bold px-6 py-3 rounded-lg shadow-[0_0_15px_rgba(212,175,55,0.4)] hover:bg-gold-light transition">
+                <i class="fa-solid fa-download mr-2"></i> Simpan Gambar (PNG)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal Struktur -->
       <div
         id="modal-struktur"
@@ -2932,9 +2937,11 @@
 
         modals: {
           open: (id, data = null) => {
-            const formId = "form-" + id.split("-")[1];
-            document.getElementById(formId).reset();
-            document.getElementById(id.split("-")[1] + "-id").value = "";
+            const form = document.getElementById("form-" + id.split("-")[1]);
+            if (form) form.reset();
+            
+            const idInput = document.getElementById(id.split("-")[1] + "-id");
+            if (idInput) idInput.value = "";
 
             const titleEl = document.getElementById("title-" + id);
             if (titleEl) {
@@ -3225,9 +3232,7 @@
         },
 
         previewIDCard: (member) => {
-           document.getElementById("idcard-empty-state").classList.add("hidden");
-           document.getElementById("idcard-preview-container").classList.remove("hidden");
-           document.getElementById("idcard-preview-container").classList.add("flex");
+           window.UI.modals.open("modal-idcard-preview");
            
            const imgUrl = member.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.nama)}&background=11261b&color=B2D2A4`;
            const fotoEl = document.getElementById("kta-foto");
@@ -3253,12 +3258,6 @@
            futureDate.setFullYear(futureDate.getFullYear() + 5);
            document.getElementById("kta-berlaku").textContent = `BERLAKU SAMPAI : ${window.Utils.formatDate(futureDate.toISOString())}`.toUpperCase();
            document.getElementById("kta-tanggal-cetak").textContent = `, ${window.Utils.formatDate(now.toISOString())}`.toUpperCase();
-           
-           if (window.innerWidth < 1024) {
-              setTimeout(() => {
-                  document.getElementById("idcard-preview-container").scrollIntoView({ behavior: "smooth", block: "start" });
-              }, 100);
-           }
         },
 
         printIDCard: async () => {
