@@ -3253,6 +3253,12 @@
            futureDate.setFullYear(futureDate.getFullYear() + 5);
            document.getElementById("kta-berlaku").textContent = `BERLAKU SAMPAI : ${window.Utils.formatDate(futureDate.toISOString())}`.toUpperCase();
            document.getElementById("kta-tanggal-cetak").textContent = `, ${window.Utils.formatDate(now.toISOString())}`.toUpperCase();
+           
+           if (window.innerWidth < 1024) {
+              setTimeout(() => {
+                  document.getElementById("idcard-preview-container").scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 100);
+           }
         },
 
         printIDCard: async () => {
