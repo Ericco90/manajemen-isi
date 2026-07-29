@@ -3253,10 +3253,14 @@
            qrEl.crossOrigin = "anonymous";
            qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrText)}`;
            
-           const now = new Date();
-           const futureDate = new Date(now);
+           // Masa Berlaku dihitung dari Tanggal Pendaftaran anggota (member.tgl)
+           const joinDate = member.tgl ? new Date(member.tgl) : new Date();
+           const futureDate = new Date(joinDate);
            futureDate.setFullYear(futureDate.getFullYear() + 5);
            document.getElementById("kta-berlaku").textContent = `BERLAKU SAMPAI : ${window.Utils.formatDate(futureDate.toISOString())}`.toUpperCase();
+           
+           // Tanggal cetak tetap hari ini (saat kartu dicetak/diunduh)
+           const now = new Date();
            document.getElementById("kta-tanggal-cetak").textContent = `, ${window.Utils.formatDate(now.toISOString())}`.toUpperCase();
         },
 
