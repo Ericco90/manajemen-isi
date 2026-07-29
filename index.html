@@ -2634,7 +2634,7 @@
                resContainer.innerHTML = "";
                return;
             }
-            const filtered = (window.App.data.anggota || []).filter(a => a.status === "Aktif" && (a.nama.toLowerCase().includes(val) || a.id.toLowerCase().includes(val)));
+            const filtered = (window.App.data.anggota || []).filter(a => a.status === "Aktif" && (a.nama.toLowerCase().includes(val) || a.id.toLowerCase().includes(val) || `${a.gelar || ""} ${a.nama}`.toLowerCase().includes(val) || `${a.nama} ${a.gelar || ""}`.toLowerCase().includes(val)));
             if (filtered.length === 0) {
                resContainer.innerHTML = `<div class="col-span-full text-center text-gray-400 py-2">Anggota tidak ditemukan.</div>`;
                return;
@@ -2643,17 +2643,25 @@
             const currentYear = String(new Date().getFullYear());
             const iuranMap = {};
             (window.App.data.iuran || []).forEach(i => {
-               const key = `${i.id_anggota}_${i.tahun}_${parseInt(i.bulan)}`;
-               if (!iuranMap[key] || i.status === "Lunas") {
-                  iuranMap[key] = i.status;
-               }
+               const idKey = (i.id_anggota || "").toLowerCase().trim();
+               const namaKey = (i.nama || "").toLowerCase().trim();
+               const key1 = `${idKey}_${i.tahun}_${parseInt(i.bulan)}`;
+               const key2 = `${namaKey}_${i.tahun}_${parseInt(i.bulan)}`;
+               if (idKey && (!iuranMap[key1] || i.status === "Lunas")) iuranMap[key1] = i.status;
+               if (namaKey && (!iuranMap[key2] || i.status === "Lunas")) iuranMap[key2] = i.status;
             });
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
 
             resContainer.innerHTML = filtered.slice(0, 3).map(a => {
               const memberYears = new Set([currentYear]);
               (window.App.data.iuran || []).forEach(i => {
-                 if (i.id_anggota === a.id && parseInt(i.tahun) >= parseInt(currentYear)) {
+                 const iId = (i.id_anggota || "").toLowerCase().trim();
+                 const iNama = (i.nama || "").toLowerCase().trim();
+                 const aId = (a.id || "").toLowerCase().trim();
+                 const aNama = (a.nama || "").toLowerCase().trim();
+                 const aGelar = (a.gelar || "").toLowerCase().trim();
+                 
+                 if ((iId === aId || (iNama && (iNama === aNama || (aGelar && iNama === aGelar) || iNama === `${aGelar} ${aNama}`.trim() || iNama === `${aNama} ${aGelar}`.trim()))) && parseInt(i.tahun) >= parseInt(currentYear)) {
                     memberYears.add(String(i.tahun));
                  }
               });
@@ -2665,8 +2673,16 @@
                  iuranHtml += `<div class="grid grid-cols-6 gap-1 mt-1 w-full">`;
                  months.forEach((m, idx) => {
                     const monthNum = idx + 1;
-                    const key = `${a.id}_${year}_${monthNum}`;
-                    const status = iuranMap[key];
+                    const idKey = (a.id || "").toLowerCase().trim();
+                    const namaKey = (a.nama || "").toLowerCase().trim();
+                    const gelarKey = (a.gelar || "").toLowerCase().trim();
+                    const k1 = `${idKey}_${year}_${monthNum}`;
+                    const k2 = `${namaKey}_${year}_${monthNum}`;
+                    const k3 = gelarKey ? `${gelarKey} ${namaKey}_${year}_${monthNum}` : "";
+                    const k4 = gelarKey ? `${namaKey} ${gelarKey}_${year}_${monthNum}` : "";
+                    const k5 = gelarKey ? `${gelarKey}_${year}_${monthNum}` : "";
+                    
+                    const status = iuranMap[k1] || iuranMap[k2] || (k3 && iuranMap[k3]) || (k4 && iuranMap[k4]) || (k5 && iuranMap[k5]);
                     let bgClass = "bg-red-900/40 border-red-500/30 text-red-400";
                     let icon = "fa-xmark";
                     if (status === "Lunas") {
@@ -2692,7 +2708,7 @@
                 <div class="flex items-center gap-3 w-full">
                   <img src="${a.foto}" onerror="this.src='https://ui-avatars.com/api/?name=${a.nama.replace(/\s+/g, '+')}&background=11261b&color=D4AF37'" class="w-10 h-10 rounded-full object-cover border border-gold/50 flex-shrink-0" />
                   <div class="overflow-hidden">
-                    <h4 class="font-bold text-gold text-sm truncate">${a.nama}</h4>
+                    <h4 class="font-bold text-gold text-sm truncate">${a.gelar || a.nama}</h4>
                     <p class="text-xs text-gray-300 truncate">${a.id} &bull; ${a.jabatan}</p>
                   </div>
                 </div>
@@ -2755,7 +2771,7 @@
               nama: nama,
               hp: document.getElementById("anggota-hp").value,
               alamat: document.getElementById("anggota-alamat").value,
-              gelar: document.getElementById("anggota-gelar").value,
+              gelar: document.getElementById("anggota-gelar").value || nama,
               keahlian: document.getElementById("anggota-keahlian").value,
               nik: document.getElementById("anggota-nik").value,
               jabatan: document.getElementById("anggota-jabatan").value,
@@ -2992,7 +3008,7 @@
           select.innerHTML = '<option value="">-- Pilih Anggota --</option>';
           window.App.data.anggota.forEach((a) => {
             if (a.status === "Aktif")
-              select.innerHTML += `<option value="${a.id}">${a.nama} - ${a.id}</option>`;
+              select.innerHTML += `<option value="${a.id}">${a.gelar || a.nama} - ${a.id}</option>`;
           });
         },
 
@@ -3163,7 +3179,9 @@
           const filtered = window.App.data.anggota.filter(
             (a) =>
               a.nama.toLowerCase().includes(search) ||
-              a.id.toLowerCase().includes(search),
+              a.id.toLowerCase().includes(search) ||
+              `${a.gelar || ""} ${a.nama}`.toLowerCase().includes(search) ||
+              `${a.nama} ${a.gelar || ""}`.toLowerCase().includes(search),
           );
 
           document.getElementById("thead-anggota").innerHTML =
@@ -3193,7 +3211,7 @@
               tbody.innerHTML += `<tr>
                             <td class="p-4 text-center"><img src="${imgUrl}" alt="${a.nama}" class="w-10 h-10 mx-auto rounded-full border border-pupus/50 object-cover bg-mystic-800 cursor-pointer hover:scale-110 transition-transform" onclick='window.UI.viewImage("${imgUrl}", ${JSON.stringify(a.nama).replace(/'/g, "&#39;")}, ${JSON.stringify(a.jabatan).replace(/'/g, "&#39;")})'></td>
                             <td class="p-4 text-xs font-mono text-gray-400">${a.id}</td>
-                            <td class="p-4 font-semibold text-white">${a.nama}</td>
+                            <td class="p-4 font-semibold text-white">${a.gelar || a.nama}</td>
                             <td class="p-4">${a.hp}</td>
                             <td class="p-4">${a.jabatan}</td>
                             <td class="p-4"><span class="px-3 py-1 text-xs rounded-full ${sts} border border-current/20">${a.status}</span></td>
@@ -3207,7 +3225,7 @@
           const searchInput = document.getElementById("search-idcard-member");
           if (!searchInput) return;
           const search = searchInput.value.toLowerCase();
-          const filtered = window.App.data.anggota.filter(a => a.status === "Aktif" && (a.nama.toLowerCase().includes(search) || a.id.toLowerCase().includes(search)));
+          const filtered = window.App.data.anggota.filter(a => a.status === "Aktif" && (a.nama.toLowerCase().includes(search) || a.id.toLowerCase().includes(search) || `${a.gelar || ""} ${a.nama}`.toLowerCase().includes(search) || `${a.nama} ${a.gelar || ""}`.toLowerCase().includes(search)));
           const listContainer = document.getElementById("idcard-member-list");
           if (!listContainer) return;
           listContainer.innerHTML = "";
@@ -3326,21 +3344,37 @@
                 ]),
               ].sort((x, y) => parseInt(y) - parseInt(x));
           const members = window.App.data.anggota
-            .filter((a) => a.status === "Aktif" && (a.nama.toLowerCase().includes(search) || a.id.toLowerCase().includes(search)))
+            .filter((a) => a.status === "Aktif" && (a.nama.toLowerCase().includes(search) || a.id.toLowerCase().includes(search) || `${a.gelar || ""} ${a.nama}`.toLowerCase().includes(search) || `${a.nama} ${a.gelar || ""}`.toLowerCase().includes(search)))
             .sort((x, y) => x.nama.localeCompare(y.nama));
 
           const iuranMap = {};
           window.App.data.iuran.forEach(i => {
-            const key = `${i.id_anggota}_${parseInt(i.bulan)}_${i.tahun}`;
-            if (!iuranMap[key] || (i.status === "Lunas" && iuranMap[key].status !== "Lunas")) {
-              iuranMap[key] = i;
-            } else if (iuranMap[key].status === i.status) {
-              if (new Date(i.tgl) > new Date(iuranMap[key].tgl)) {
-                 iuranMap[key] = i;
-              }
+            const idKey = (i.id_anggota || "").toLowerCase().trim();
+            const namaKey = (i.nama || "").toLowerCase().trim();
+            const key1 = `${idKey}_${parseInt(i.bulan)}_${i.tahun}`;
+            const key2 = `${namaKey}_${parseInt(i.bulan)}_${i.tahun}`;
+            
+            if (idKey) {
+              if (!iuranMap[key1] || (i.status === "Lunas" && iuranMap[key1].status !== "Lunas")) iuranMap[key1] = i;
+              else if (iuranMap[key1].status === i.status && new Date(i.tgl) > new Date(iuranMap[key1].tgl)) iuranMap[key1] = i;
+            }
+            if (namaKey) {
+              if (!iuranMap[key2] || (i.status === "Lunas" && iuranMap[key2].status !== "Lunas")) iuranMap[key2] = i;
+              else if (iuranMap[key2].status === i.status && new Date(i.tgl) > new Date(iuranMap[key2].tgl)) iuranMap[key2] = i;
             }
           });
-          const getMonthlyIuran = (idAnggota, bulan, tahun) => iuranMap[`${idAnggota}_${parseInt(bulan)}_${tahun}`];
+          const getMonthlyIuran = (member, bulan, tahun) => {
+             const idKey = (member.id || "").toLowerCase().trim();
+             const namaKey = (member.nama || "").toLowerCase().trim();
+             const gelarKey = (member.gelar || "").toLowerCase().trim();
+             const k1 = `${idKey}_${parseInt(bulan)}_${tahun}`;
+             const k2 = `${namaKey}_${parseInt(bulan)}_${tahun}`;
+             const k3 = gelarKey ? `${gelarKey} ${namaKey}_${parseInt(bulan)}_${tahun}` : "";
+             const k4 = gelarKey ? `${namaKey} ${gelarKey}_${parseInt(bulan)}_${tahun}` : "";
+             const k5 = gelarKey ? `${gelarKey}_${parseInt(bulan)}_${tahun}` : "";
+             
+             return iuranMap[k1] || iuranMap[k2] || (k3 && iuranMap[k3]) || (k4 && iuranMap[k4]) || (k5 && iuranMap[k5]);
+          };
 
           document.getElementById("thead-iuran").innerHTML =
             `<tr><th class="p-4">Anggota</th><th class="p-4">Bulan</th><th class="p-4">Tahun</th><th class="p-4 text-right">Nominal</th><th class="p-4 text-center">Status</th><th class="p-4">Keterangan</th>${window.App.isAdmin ? '<th class="p-4 text-center admin-only">Aksi</th>' : ""}</tr>`;
@@ -3353,7 +3387,7 @@
             members.forEach((member) => {
               years.forEach((tahun) => {
                 months.forEach((bulan) => {
-                  const i = getMonthlyIuran(member.id, bulan, tahun);
+                  const i = getMonthlyIuran(member, bulan, tahun);
                   const status = i?.status || "Belum Setor";
                   const stCls =
                     status === "Lunas"
@@ -3377,7 +3411,7 @@
                   const nominalDisplay = i ? window.Utils.formatRupiah(i.nominal) : window.Utils.formatRupiah(10000);
                   const nominalColor = status === "Lunas" ? "text-pupus" : (status === "Belum Lunas" ? "text-orange-300" : "text-red-400/80");
 
-                  htmlRows += `<tr><td class="p-4 font-semibold">${member.nama}<div class="text-[10px] text-gray-500 font-mono">${member.id}</div></td><td class="p-4">${window.Utils.getMonthName(bulan)}</td><td class="p-4">${tahun}</td><td class="p-4 text-right font-semibold ${nominalColor}">${nominalDisplay}</td><td class="p-4 text-center"><span class="px-2 py-1 text-xs rounded border ${stCls} uppercase tracking-wider">${status}</span></td><td class="p-4 text-sm text-gray-400">${keterangan}</td>${actions}</tr>`;
+                  htmlRows += `<tr><td class="p-4 font-semibold">${member.gelar || member.nama}<div class="text-[10px] text-gray-500 font-mono">${member.id}</div></td><td class="p-4">${window.Utils.getMonthName(bulan)}</td><td class="p-4">${tahun}</td><td class="p-4 text-right font-semibold ${nominalColor}">${nominalDisplay}</td><td class="p-4 text-center"><span class="px-2 py-1 text-xs rounded border ${stCls} uppercase tracking-wider">${status}</span></td><td class="p-4 text-sm text-gray-400">${keterangan}</td>${actions}</tr>`;
                 });
               });
             });
@@ -3691,12 +3725,12 @@
           const tA = window.App.data.anggota.filter(
             (a) => a.status === "Aktif",
           ).length;
-          const pM = new Set(
+          let pM = new Set(
             window.App.data.iuran
               .filter(
                 (i) => i.bulan === cM && i.tahun == cY && i.status === "Lunas",
               )
-              .map((i) => i.id_anggota),
+              .map((i) => i.id_anggota || i.nama),
           ).size;
           let belum = tA - pM;
           if (belum < 0) belum = 0;
